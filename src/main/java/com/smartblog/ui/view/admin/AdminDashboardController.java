@@ -37,7 +37,7 @@ public class AdminDashboardController {
     @FXML private Button viewAllPostsBtn;
     @FXML private Button viewCommentsBtn;
     @FXML private Button viewTagsBtn;
-    
+
     // Search controls
     @FXML private TextField searchKeywordField;
     @FXML private ComboBox<String> searchTagCombo;
@@ -75,6 +75,7 @@ public class AdminDashboardController {
         if (viewTagsBtn != null) {
             viewTagsBtn.setOnAction(e -> NavigationService.navigate(View.TAG_MANAGER));
         }
+
         
         // Setup drafts list with custom cells
         draftsList.setCellFactory(lv -> new ListCell<PostDTO>() {

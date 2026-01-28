@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.smartblog.ui.view.performance.PerformanceController"
+      spacing="16" style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-background: linear-gradient(to right, #667eea 0%, #764ba2 100%); -fx-background-radius: 8; -fx-padding: 16;">
+        <Button text="←" onAction="#handleBack" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16; -fx-padding: 0 8;" />
+        <Label text="⚡ Performance Benchmark Report" style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <ProgressIndicator fx:id="progressIndicator" prefWidth="24" prefHeight="24" style="-fx-progress-color: white;"/>
+        <CheckBox fx:id="clearCacheChk" text="Clear caches before run" style="-fx-text-fill: white; -fx-opacity: 0.9; -fx-font-size: 12; -fx-padding: 0 8;" />
+        <Button fx:id="runBenchmarkBtn" text="Run Benchmarks" onAction="#handleRunBenchmarks"
+            style="-fx-background-color: white; -fx-text-fill: #667eea; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 4;"/>
+        <Button fx:id="runColdWarmBtn" text="Run Cold + Warm" onAction="#handleRunColdWarm"
+            style="-fx-background-color: white; -fx-text-fill: #667eea; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 4;"/>
+        <Button fx:id="exportBtn" text="Export Report" onAction="#handleExport"
+            style="-fx-background-color: rgba(255,255,255,0.9); -fx-text-fill: #667eea; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 4;"/>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLbl" text="Ready" style="-fx-font-size: 13; -fx-text-fill: #666;"/>
+
+    <!-- Summary Statistics -->
+    <TitledPane text="📊 Summary Statistics" expanded="true" collapsible="false"
+                style="-fx-background-color: white; -fx-background-radius: 8;">
+        <GridPane hgap="20" vgap="12" style="-fx-padding: 16;">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="20"/>
+                <ColumnConstraints percentWidth="30"/>
+                <ColumnConstraints percentWidth="20"/>
+                <ColumnConstraints percentWidth="30"/>
+            </columnConstraints>
+
+            <!-- Row 1 -->
+            <Label text="Total Tests:" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <Label fx:id="totalTestsLbl" text="0" style="-fx-text-fill: #667eea; -fx-font-size: 14; -fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="Total Duration:" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            <Label fx:id="totalDurationLbl" text="0 ms" style="-fx-text-fill: #667eea; -fx-font-size: 14; -fx-font-weight: bold;" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+            <!-- Row 2 -->
+            <Label text="Average Duration:" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <Label fx:id="avgDurationLbl" text="0.00 ms" style="-fx-text-fill: #667eea; -fx-font-size: 14; -fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <!-- Row 3 -->
+            <Label text="Slowest Test:" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Label fx:id="slowestTestLbl" text="-" wrapText="true" style="-fx-text-fill: #e74c3c; -fx-font-size: 12;" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3"/>
+
+            <!-- Row 4 -->
+            <Label text="Fastest Test:" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <Label fx:id="fastestTestLbl" text="-" wrapText="true" style="-fx-text-fill: #27ae60; -fx-font-size: 12;" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3"/>
+        </GridPane>
+    </TitledPane>
+
+    <!-- Results Table -->
+    <TitledPane text="📈 Detailed Results" expanded="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color: white; -fx-background-radius: 8;">
+        <TableView fx:id="resultsTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white;">
+            <columns>
+                <TableColumn fx:id="testNameColumn" text="Test Name" prefWidth="500" style="-fx-font-size: 13;"/>
+                <TableColumn fx:id="durationColumn" text="Duration (ms)" prefWidth="150" style="-fx-font-size: 13; -fx-alignment: CENTER-RIGHT;"/>
+            </columns>
+        </TableView>
+    </TitledPane>
+
+    <!-- Info Section -->
+    <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding: 12; -fx-background-color: #e8eaf6; -fx-background-radius: 6;">
+        <Label text="ℹ️" style="-fx-font-size: 16;"/>
+        <Label text="These benchmarks measure query performance with current database indexes (V2 + V3). Lower times indicate better performance."
+               wrapText="true" style="-fx-text-fill: #5c6bc0; -fx-font-size: 12;"/>
+    </HBox>
+</VBox>

@@ -56,6 +56,17 @@ public class AuthorDashboardController {
     @FXML
     public void initialize() {
         heading.setText("Author Dashboard — your posts & reviews");
+        // Load author-specific stylesheet once the scene is ready
+        heading.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                try {
+                    String css = getClass().getResource("/com/smartblog/ui/themes/author-overrides.css").toExternalForm();
+                    newScene.getStylesheets().add(css);
+                } catch (Exception ex) {
+                    System.err.println("Failed to load author-overrides.css: " + ex.getMessage());
+                }
+            }
+        });
         
         // Setup search controls
         setupSearchControls();

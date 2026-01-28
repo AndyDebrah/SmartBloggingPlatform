@@ -1,0 +1,20 @@
+PERFORMANCE BENCHMARK REPORT (Cold + Warm)
+
+List 100 posts (cold) (avg of 5 runs) : 73 ms
+Search posts by keyword 'java' (cold) (avg of 5 runs) : 3 ms
+List posts by author (cold) (avg of 5 runs) : 56 ms
+Search by tag 'JavaFX' (cold) (avg of 5 runs) : 64 ms
+Combined search (cold) (avg of 5 runs) : 1 ms
+List comments for post (cold) (avg of 5 runs) : 1 ms
+List all tags (cold) (avg of 5 runs) : 0 ms
+First search (cached) (cold) : 2 ms
+Second search (cached) (cold) : 1 ms
+List 100 posts (warm) (avg of 5 runs) : 71 ms
+Search posts by keyword 'java' (warm) (avg of 5 runs) : 2 ms
+List posts by author (warm) (avg of 5 runs) : 60 ms
+Search by tag 'JavaFX' (warm) (avg of 5 runs) : 53 ms
+Combined search (warm) (avg of 5 runs) : 0 ms
+List comments for post (warm) (avg of 5 runs) : 0 ms
+List all tags (warm) (avg of 5 runs) : 0 ms
+First search (cached) (warm) : 1 ms
+Second search (cached) (warm) : 1 ms

@@ -23,8 +23,8 @@
     <!-- Main Content with Sidebar -->
     <center>
         <HBox>
-            <!-- Sidebar Navigation -->
-            <VBox styleClass="sidebar" prefWidth="240" spacing="8">
+            <!-- Sidebar Navigation (hidden for minimal landing) -->
+            <VBox styleClass="sidebar" prefWidth="240" spacing="8" visible="false" managed="false">
                 <padding>
                     <Insets top="24" bottom="24" left="16" right="16"/>
                 </padding>
@@ -64,42 +64,12 @@
                         maxWidth="Infinity"/>
             </VBox>
             
-            <!-- Content Area -->
+            <!-- Content Area (minimal landing) -->
             <StackPane fx:id="contentArea" styleClass="content-area" HBox.hgrow="ALWAYS">
-                <VBox alignment="CENTER" spacing="24">
+                <VBox alignment="CENTER" spacing="12">
                     <Label text="Welcome to SmartBlog" styleClass="heading-1"/>
-                    <Label text="Select an option from the sidebar to get started"
-                           styleClass="text-secondary"/>
-                    
-                    <!-- Quick Stats -->
-                    <HBox spacing="16" alignment="CENTER">
-                        <VBox styleClass="card" alignment="CENTER" spacing="8" prefWidth="200" prefHeight="120">
-                            <padding>
-                                <Insets top="20" bottom="20" left="20" right="20"/>
-                            </padding>
-                            <Label text="📝" style="-fx-font-size: 32px;"/>
-                            <Label text="0" styleClass="heading-2"/>
-                            <Label text="Total Posts" styleClass="text-secondary"/>
-                        </VBox>
-                        
-                        <VBox styleClass="card" alignment="CENTER" spacing="8" prefWidth="200" prefHeight="120">
-                            <padding>
-                                <Insets top="20" bottom="20" left="20" right="20"/>
-                            </padding>
-                            <Label text="💬" style="-fx-font-size: 32px;"/>
-                            <Label text="0" styleClass="heading-2"/>
-                            <Label text="Comments" styleClass="text-secondary"/>
-                        </VBox>
-                        
-                        <VBox styleClass="card" alignment="CENTER" spacing="8" prefWidth="200" prefHeight="120">
-                            <padding>
-                                <Insets top="20" bottom="20" left="20" right="20"/>
-                            </padding>
-                            <Label text="👁️" style="-fx-font-size: 32px;"/>
-                            <Label text="0" styleClass="heading-2"/>
-                            <Label text="Total Views" styleClass="text-secondary"/>
-                        </VBox>
-                    </HBox>
+                    <Label text="This is a minimal landing page. Use the Admin or Author dashboards for management."
+                           styleClass="text-secondary" wrapText="true" maxWidth="800"/>
                 </VBox>
             </StackPane>
         </HBox>

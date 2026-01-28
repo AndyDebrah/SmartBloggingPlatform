@@ -68,7 +68,7 @@ public class PostRepositoryJdbc implements PostRepository {
         int offset = Math.max(0, (page-1)*size);
         List<Post> out = new ArrayList<>();
         try (var con = ds.getConnection(); var ps = con.prepareStatement(sql)) {
-            ps.setString(1, keyword); ps.setString(2, keyword); ps.setInt(3, size); ps.setInt(4, offset);
+            ps.setString(1, keyword); ps.setInt(2, size); ps.setInt(3, offset);
             try (var rs = ps.executeQuery()) { while (rs.next()) out.add(map(rs)); }
             return out;
         } catch (SQLException e) { throw new RuntimeException("Post search failed", e); }

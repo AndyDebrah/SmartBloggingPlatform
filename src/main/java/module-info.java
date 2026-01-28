@@ -24,6 +24,7 @@ module SmartBloggingPlatform {
     opens com.smartblog.ui.view.users to javafx.fxml;
     opens com.smartblog.ui.view.analytics to javafx.fxml;
     opens com.smartblog.ui.view.admin to javafx.fxml;
+    opens com.smartblog.ui.view.performance to javafx.fxml;
     opens com.smartblog.ui.view.authors to javafx.fxml;
 
     exports com.smartblog;

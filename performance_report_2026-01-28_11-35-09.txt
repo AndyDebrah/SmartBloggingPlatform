@@ -1,0 +1,25 @@
+================================================================================
+PERFORMANCE BENCHMARK REPORT
+================================================================================
+
+Test Results:
+--------------------------------------------------------------------------------
+List 100 posts (avg of 5 runs)                         43 ms
+Search posts by keyword 'java' (avg of 5 runs)          1 ms
+List posts by author (avg of 5 runs)                   28 ms
+Search by tag 'JavaFX' (avg of 5 runs)                 31 ms
+Combined search (avg of 5 runs)                         0 ms
+List comments for post (avg of 5 runs)                  0 ms
+List all tags (avg of 5 runs)                           0 ms
+First search (cached)                                   2 ms
+Second search (cached)                                  1 ms
+--------------------------------------------------------------------------------
+
+Summary Statistics:
+  Total tests:      9
+  Total duration:   106 ms
+  Average duration: 11.78 ms
+  Slowest test:     List 100 posts (avg of 5 runs) (43 ms)
+  Fastest test:     Combined search (avg of 5 runs) (0 ms)
+
+================================================================================

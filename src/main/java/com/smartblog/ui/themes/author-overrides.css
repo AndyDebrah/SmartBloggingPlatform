@@ -1,0 +1,13 @@
+/* Author dashboard overrides - increase contrast for sidebar labels */
+.author-sidebar .label {
+    -fx-text-fill: #334155; /* darker secondary */
+}
+.author-sidebar .label[style*="-fx-font-size: 11px"] {
+    -fx-text-fill: #334155;
+}
+.author-sidebar .text-field, .author-sidebar .combo-box, .author-sidebar .button {
+    -fx-text-fill: #0b1220;
+}
+.author-root .label.heading-1 {
+    -fx-text-fill: -fx-text-fill; /* keep existing */
+}

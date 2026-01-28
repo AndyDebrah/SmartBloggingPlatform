@@ -11,7 +11,8 @@ public enum View {
     USERS("/com/smartblog/ui/view/users/UserListView.fxml"),
     AUTHOR("/com/smartblog/ui/view/authors/AuthorDashboardView.fxml"),
     ADMIN("/com/smartblog/ui/view/admin/AdminDashboardView.fxml"),
-    ANALYTICS("/com/smartblog/ui/view/analytics/AnalyticsView.fxml");
+    ANALYTICS("/com/smartblog/ui/view/analytics/AnalyticsView.fxml"),
+    PERFORMANCE("/com/smartblog/ui/view/performance/PerformanceView.fxml");
 
     public final String fxml;
     View(String fxml) { this.fxml = fxml; }

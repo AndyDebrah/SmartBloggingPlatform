@@ -1,9 +1,10 @@
 
 package com.smartblog.infrastructure.caching;
 
-import com.github.benmanes.caffeine.cache.*;
-
 import java.util.concurrent.TimeUnit;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 public final class CacheManager {
 
@@ -18,4 +19,13 @@ public final class CacheManager {
                     .expireAfterWrite(30, TimeUnit.MINUTES)
                     .maximumSize(1000)
                     .build();
+
+        /**
+         * Clear all application caches managed here.
+         * Can be used by diagnostics or benchmarks to force cold runs.
+         */
+        public static void clearAll() {
+                postCache.invalidateAll();
+                userCache.invalidateAll();
+        }
 }
