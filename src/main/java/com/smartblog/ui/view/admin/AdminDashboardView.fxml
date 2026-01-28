@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.smartblog.ui.view.admin.AdminDashboardController"
+      styleClass="root">
+
+    <!-- Modern Header with gradient -->
+    <top>
+        <VBox styleClass="modern-header" style="-fx-background-color: linear-gradient(to right, #f093fb 0%, #f5576c 100%); -fx-padding: 24 32;">
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Button fx:id="backBtn" text="← Back" 
+                        styleClass="btn-glass" 
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8 16; -fx-background-radius: 6;" />
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Admin Dashboard" 
+                           style="-fx-font-size: 28px; -fx-font-weight: 700; -fx-text-fill: white;"/>
+                    <HBox spacing="24">
+                        <Label fx:id="statsLabel" text="Posts: 0    Comments: 0" 
+                               style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                    </HBox>
+                </VBox>
+                <Button fx:id="refreshBtn" text="🔄 Refresh" 
+                        styleClass="btn-glass"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8 16; -fx-background-radius: 6;" />
+                <Button fx:id="manageUsersBtn" text="👥 Manage Users" 
+                        style="-fx-background-color: white; -fx-text-fill: #f5576c; -fx-font-size: 14px; -fx-font-weight: 600; -fx-padding: 10 24; -fx-background-radius: 6;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="20" style="-fx-padding: 20; -fx-background-color: #f5f7fa;">
+            <!-- Left Column: Stats Cards -->
+            <VBox spacing="16" prefWidth="320">
+                <!-- Search Panel -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                    <Label text="🔍 SEARCH POSTS" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #8b93a7; -fx-letter-spacing: 0.5;"/>
+                    <TextField fx:id="searchKeywordField" promptText="Search by keyword..." 
+                              style="-fx-background-radius: 6; -fx-background-color: white; -fx-border-color: #e8ecf4; -fx-border-radius: 6; -fx-padding: 8 12; -fx-text-fill: #2d3748; -fx-prompt-text-fill: #8b93a7;"/>
+                    <ComboBox fx:id="searchTagCombo" promptText="Filter by tag" 
+                             style="-fx-background-radius: 6;"
+                             maxWidth="Infinity"/>
+                    <TextField fx:id="searchAuthorField" promptText="Search by author..." 
+                              style="-fx-background-radius: 6; -fx-background-color: white; -fx-border-color: #e8ecf4; -fx-border-radius: 6; -fx-padding: 8 12; -fx-text-fill: #2d3748; -fx-prompt-text-fill: #8b93a7;"/>
+                    <ComboBox fx:id="searchSortCombo" promptText="Sort by" 
+                             style="-fx-background-radius: 6;"
+                             maxWidth="Infinity"/>
+                    <HBox spacing="8">
+                        <Button fx:id="searchExecuteBtn" text="🔍 Search" 
+                               style="-fx-background-color: #f5576c; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 8 16; -fx-background-radius: 6;"
+                               HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Button fx:id="searchClearBtn" text="✕" 
+                               style="-fx-background-color: #f8f9fc; -fx-text-fill: #8b93a7; -fx-font-size: 12px; -fx-padding: 8 12; -fx-background-radius: 6; -fx-border-color: #e8ecf4; -fx-border-radius: 6;"/>
+                    </HBox>
+                </VBox>
+                
+                <!-- Top Tags Card -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                    <Label text="🏷️ TOP TAGS" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #8b93a7; -fx-letter-spacing: 0.5;"/>
+                    <ListView fx:id="topTagsList" prefHeight="300" 
+                             style="-fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 0;" />
+                </VBox>
+                
+                <!-- Quick Actions Card -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                    <Label text="⚡ QUICK ACTIONS" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #8b93a7; -fx-letter-spacing: 0.5;"/>
+                    <Button fx:id="viewAllPostsBtn" text="📝 View All Posts" 
+                            style="-fx-background-color: #f8f9fc; -fx-text-fill: #2d3748; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e8ecf4; -fx-border-radius: 8; -fx-alignment: center-left; -fx-font-size: 13px;" 
+                            maxWidth="Infinity"/>
+                    <Button fx:id="viewCommentsBtn" text="💬 Manage Comments" 
+                            style="-fx-background-color: #f8f9fc; -fx-text-fill: #2d3748; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e8ecf4; -fx-border-radius: 8; -fx-alignment: center-left; -fx-font-size: 13px;" 
+                            maxWidth="Infinity"/>
+                    <Button fx:id="viewTagsBtn" text="🏷️ Manage Tags" 
+                            style="-fx-background-color: #f8f9fc; -fx-text-fill: #2d3748; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e8ecf4; -fx-border-radius: 8; -fx-alignment: center-left; -fx-font-size: 13px;" 
+                            maxWidth="Infinity"/>
+                </VBox>
+            </VBox>
+
+            <!-- Main Content: Recent Drafts with Publish Functionality -->
+            <VBox spacing="0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" 
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                <VBox spacing="12" style="-fx-padding: 20;">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="📋 PENDING DRAFTS" style="-fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: #2d3748;"/>
+                        <Label text="•" style="-fx-text-fill: #cbd5e0;"/>
+                        <Label text="Click drafts to publish them" style="-fx-font-size: 13px; -fx-text-fill: #8b93a7;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="draftCountLabel" text="0 drafts" style="-fx-font-size: 12px; -fx-text-fill: #8b93a7; -fx-background-color: #f8f9fc; -fx-padding: 4 12; -fx-background-radius: 12;"/>
+                    </HBox>
+                </VBox>
+                <Separator style="-fx-background-color: #e8ecf4;"/>
+                <ListView fx:id="draftsList" VBox.vgrow="ALWAYS" 
+                         style="-fx-background-color: white; -fx-background-insets: 0; -fx-padding: 0; -fx-background-radius: 0 0 12 12;"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

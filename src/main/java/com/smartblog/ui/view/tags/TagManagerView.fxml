@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.smartblog.ui.view.tags.TagManagerController"
+      spacing="10" style="-fx-padding: 12;">
+    <HBox spacing="8">
+        <TextField fx:id="newTagField" promptText="New tag name"/>
+        <Button text="Create" fx:id="createBtn"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Back" fx:id="backBtn"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="postIdField" promptText="Post ID for assign/remove" prefWidth="160"/>
+    </HBox>
+
+    <SplitPane dividerPositions="0.5">
+        <items>
+            <VBox spacing="6">
+                <Label text="All Tags"/>
+                <ListView fx:id="allTags"/>
+            </VBox>
+            <VBox spacing="6">
+                <Label text="Tags for Post"/>
+                <ListView fx:id="postTags"/>
+                <HBox spacing="8">
+                    <Button text="Assign →" fx:id="assignBtn"/>
+                    <Button text="← Remove" fx:id="removeBtn"/>
+                </HBox>
+            </VBox>
+        </items>
+    </SplitPane>
+</VBox>

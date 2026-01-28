@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+    fx:controller="com.smartblog.ui.view.posts.editor.PostEditorController"
+    spacing="12" style="-fx-padding: 15;" styleClass="editor-root">
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Button text="Back" fx:id="backBtn" />
+        <Label text="Edit Post" styleClass="heading-2" />
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Title:"/>
+        <TextField fx:id="titleField" promptText="Enter post title" HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <SplitPane dividerPositions="0.5">
+        <items>
+            <HTMLEditor fx:id="htmlEditor" prefHeight="500"/>
+            <WebView fx:id="previewPane"/>
+        </items>
+    </SplitPane>
+
+    <HBox spacing="12" styleClass="editor-toolbar">
+        <Button text="Save Draft" fx:id="saveDraftBtn" styleClass="btn btn-primary"/>
+        <Button text="Publish" fx:id="publishBtn" styleClass="btn btn-accent"/>
+        <Button text="Tags" fx:id="tagBtn" styleClass="btn"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <HBox spacing="6" alignment="CENTER_RIGHT">
+            <VBox spacing="4">
+                <TextField fx:id="tagInput" promptText="Add tag..." />
+                <ListView fx:id="tagSuggestions" prefHeight="80" prefWidth="200"/>
+            </VBox>
+            <Label fx:id="autosaveLabel" style="-fx-text-fill: -color-success;" styleClass="label label-success"/>
+        </HBox>
+    </HBox>
+
+    <FlowPane fx:id="assignedTagsPane" hgap="6" vgap="6" />
+
+</VBox>

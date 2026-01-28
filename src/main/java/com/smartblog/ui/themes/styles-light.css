@@ -1,0 +1,355 @@
+
+/* Modern Light Theme - Professional Blogging Platform */
+
+.root {
+    -fx-base: -color-bg-base;
+    -fx-background: -color-bg-secondary;
+    -fx-background-color: -color-bg-secondary;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 16px;
+}
+
+/* Polished button aliases to match .btn used across FXML */
+.btn {
+    -fx-background-color: -color-bg-base;
+    -fx-text-fill: -color-text-primary;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}
+.btn:hover { -fx-background-color: -color-bg-hover; }
+.btn.btn-primary { -fx-background-color: -color-primary; -fx-text-fill: -color-text-inverse; -fx-border-color: transparent; }
+.btn.btn-accent { -fx-background-color: -color-primary-dark; -fx-text-fill: -color-text-inverse; -fx-border-color: transparent; }
+
+/* Global spacing helpers */
+.container { -fx-padding: 24px; }
+.card { -fx-background-color: -color-bg-base; -fx-border-color: -color-border; -fx-padding: 12px; -fx-background-radius: 8px; }
+
+/* Typography */
+.text-primary { -fx-text-fill: -color-text-primary; }
+.text-secondary { -fx-text-fill: -color-text-secondary; }
+.text-muted { -fx-text-fill: -color-text-tertiary; }
+
+.heading-1 {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-primary;
+}
+
+.heading-2 {
+    -fx-font-size: 30px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-primary;
+}
+
+.heading-3 {
+    -fx-font-size: 24px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-primary;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: -color-bg-base;
+    -fx-text-fill: -color-text-primary;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: -radius-md;
+    -fx-background-radius: -radius-md;
+    -fx-padding: -space-sm -space-lg;
+    -fx-font-size: -font-sm;
+    -fx-font-weight: -font-weight-medium;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: -color-bg-hover;
+}
+
+.button:pressed {
+    -fx-background-color: derive(-color-bg-hover, -5%);
+}
+
+.button-primary {
+    -fx-background-color: -color-primary;
+    -fx-text-fill: -color-text-inverse;
+    -fx-border-color: transparent;
+}
+
+.button-primary:hover {
+    -fx-background-color: -color-primary-dark;
+}
+
+.button-success {
+    -fx-background-color: -color-success;
+    -fx-text-fill: -color-text-inverse;
+    -fx-border-color: transparent;
+}
+
+.button-danger {
+    -fx-background-color: -color-danger;
+    -fx-text-fill: -color-text-inverse;
+    -fx-border-color: transparent;
+}
+
+/* Text Fields */
+.text-field {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-text-primary;
+}
+
+.text-field:focused {
+    -fx-border-color: -color-primary;
+    -fx-border-width: 2px;
+}
+
+.text-area {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 12px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-text-primary;
+}
+
+.text-area:focused {
+    -fx-border-color: -color-primary;
+    -fx-border-width: 2px;
+}
+
+.text-area .content {
+    -fx-background-color: -color-bg-base;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: -color-text-primary;
+    -fx-font-size: 14px;
+}
+
+.label-secondary {
+    -fx-text-fill: -color-text-secondary;
+}
+
+.label-error {
+    -fx-text-fill: -color-danger;
+}
+
+/* TableView */
+.table-view {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.table-view .column-header {
+    -fx-background-color: -color-bg-secondary;
+    -fx-border-color: -color-border;
+    -fx-text-fill: -color-text-secondary;
+    -fx-font-weight: -font-weight-semibold;
+    -fx-font-size: -font-xs;
+    -fx-padding: 12px;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: -color-text-primary;
+    -fx-padding: -space-md;
+    -fx-border-color: transparent transparent -color-border-light transparent;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -color-info-light;
+}
+
+/* ListView */
+.list-view {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: -radius-lg;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-primary;
+    -fx-padding: -space-md;
+}
+
+.list-cell:selected {
+    -fx-background-color: -color-info-light;
+}
+
+.list-cell:hover {
+    -fx-background-color: -color-bg-hover;
+}
+
+/* ScrollBar */
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: derive(-color-border-dark, 20%);
+    -fx-background-radius: -radius-full;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -color-border-dark;
+}
+
+/* MenuBar & Menu */
+.menu-bar {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.menu-button {
+    -fx-background-color: transparent;
+}
+
+.menu-button:hover {
+    -fx-background-color: -color-bg-hover;
+}
+
+/* Progress Indicators */
+.progress-bar {
+    -fx-background-color: -color-bg-secondary;
+}
+
+.progress-bar .bar {
+    -fx-background-color: -color-primary;
+    -fx-background-radius: -radius-full;
+}
+
+/* TabPane */
+.tab-pane {
+    -fx-tab-min-height: 40px;
+    -fx-background-color: -color-bg-base;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: -radius-md -radius-md 0 0;
+    -fx-border-color: transparent transparent -color-border transparent;
+}
+
+.tab:selected {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: transparent transparent -color-primary transparent;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.tab .tab-label {
+    -fx-text-fill: -color-text-secondary;
+    -fx-font-weight: -font-weight-medium;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: -color-primary;
+}
+
+/* Tooltips */
+.tooltip {
+    -fx-background-color: derive(-color-text-primary, -80%);
+    -fx-text-fill: -color-text-inverse;
+    -fx-background-radius: -radius-sm;
+    -fx-padding: -space-xs -space-sm;
+    -fx-font-size: -font-xs;
+}
+
+/* Separators */
+.separator {
+    -fx-background-color: -color-border;
+}
+
+/* CheckBox & RadioButton */
+.check-box, .radio-button {
+    -fx-text-fill: -color-text-primary;
+}
+
+.check-box .box, .radio-button .radio {
+    -fx-border-color: -color-border-dark;
+    -fx-border-radius: -radius-sm;
+}
+
+.check-box:selected .mark, .radio-button:selected .dot {
+    -fx-background-color: -color-primary;
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: -color-border;
+    -fx-border-radius: -radius-md;
+}
+
+/* Specific Component Styles */
+.sidebar {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: transparent -color-border transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+}
+
+/* Sidebar layout and polish */
+.sidebar {
+    -fx-pref-width: 260px;
+    -fx-padding: 16px;
+}
+
+/* Top bar polish */
+.top-bar {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 16px;
+    -fx-min-height: 56px;
+    -fx-alignment: center-left;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0.0, 0, 2);
+}
+
+/* Table / list hover and card elevation */
+.table-row-cell:hover { -fx-background-color: -color-bg-hover; }
+.list-cell:hover { -fx-background-color: -color-bg-hover; }
+.card { -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0.0, 0, 2); }
+
+.top-bar {
+    -fx-background-color: -color-bg-base;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: -space-lg;
+}
+
+.content-area {
+    -fx-background-color: -color-bg-secondary;
+    -fx-padding: 24px;
+}
+
+.status-badge {
+    -fx-background-radius: 9999px;
+    -fx-padding: 4px 12px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.status-published {
+    -fx-background-color: -color-success-light;
+    -fx-text-fill: -color-success;
+}
+
+.status-draft {
+    -fx-background-color: -color-warning-light;
+    -fx-text-fill: -color-warning;
+}

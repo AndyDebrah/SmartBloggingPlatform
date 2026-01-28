@@ -1,0 +1,133 @@
+
+/* Modern Professional Theme Variables (JavaFX-compatible) */
+.root {
+    /* Primary Colors */
+    -color-primary: #2563eb;
+    -color-primary-dark: #1e40af;
+    -color-primary-light: #60a5fa;
+
+    /* Background Colors */
+    -color-bg-base: #ffffff;
+    -color-bg-secondary: #f8fafc;
+    -color-bg-tertiary: #f1f5f9;
+    -color-bg-hover: #e2e8f0;
+
+    /* Text Colors */
+    -color-text-primary: #0f172a;
+    -color-text-secondary: #475569;
+    -color-text-tertiary: #94a3b8;
+    -color-text-inverse: #ffffff;
+
+    /* Status Colors */
+    -color-success: #10b981;
+    -color-success-light: #d1fae5;
+    -color-warning: #f59e0b;
+    -color-warning-light: #fef3c7;
+    -color-danger: #ef4444;
+    -color-danger-light: #fee2e2;
+    -color-info: #3b82f6;
+    -color-info-light: #dbeafe;
+
+    /* Border Colors */
+    -color-border: #e2e8f0;
+    -color-border-dark: #cbd5e1;
+    -color-border-light: #f1f5f9;
+
+    /* Spacing Scale */
+    -space-xs: 4px;
+    -space-sm: 8px;
+    -space-md: 12px;
+    -space-lg: 16px;
+    -space-xl: 24px;
+    -space-2xl: 32px;
+    -space-3xl: 48px;
+
+    /* Layout */
+    -layout-sidebar-width: 260px;
+
+    /* Border Radius */
+    -radius-sm: 4px;
+    -radius-md: 6px;
+    -radius-lg: 8px;
+    -radius-xl: 12px;
+    -radius-full: 9999px;
+
+    /* Typography */
+    -font-xs: 12px;
+    -font-sm: 14px;
+    -font-md: 16px;
+    -font-lg: 18px;
+    -font-xl: 20px;
+    -font-2xl: 24px;
+    -font-3xl: 30px;
+    -font-4xl: 36px;
+
+    /* Font Weights */
+    -font-weight-normal: 400;
+    -font-weight-medium: 500;
+    -font-weight-semibold: 600;
+    -font-weight-bold: 700;
+
+    /* Transitions */
+    -transition-fast: 150ms;
+    -transition-normal: 200ms;
+    -transition-slow: 300ms;
+}
+
+/* Common Component Styles */
+.card {
+    -fx-background-color: -color-bg-base;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 1);
+}
+
+.card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 2);
+}
+
+.toast {
+    -fx-background-color: derive(-color-text-primary, -80%);
+    -fx-text-fill: -color-text-inverse;
+    -fx-padding: 12px 16px;
+    -fx-background-radius: -radius-md;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 12, 0, 0, 2);
+}
+
+.overlay {
+    -fx-background-color: rgba(15, 23, 42, 0.5);
+}
+
+/* Editor specific styles */
+.editor-root {
+    -fx-background-color: -color-bg-base;
+    -fx-padding: 16px;
+}
+
+.editor-toolbar {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 0;
+    -fx-alignment: center-left;
+}
+
+/* Button alias used in FXML (btn) to match .button tokens */
+.btn {
+    -fx-background-color: -color-bg-base;
+    -fx-text-fill: -color-text-primary;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: -radius-md;
+    -fx-background-radius: -radius-md;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.btn:hover { -fx-background-color: -color-bg-hover; }
+
+.btn.btn-primary { -fx-background-color: -color-primary; -fx-text-fill: -color-text-inverse; -fx-border-color: transparent; }
+.btn.btn-accent { -fx-background-color: -color-primary-dark; -fx-text-fill: -color-text-inverse; -fx-border-color: transparent; }
+
+.label-success { -fx-text-fill: -color-success; }

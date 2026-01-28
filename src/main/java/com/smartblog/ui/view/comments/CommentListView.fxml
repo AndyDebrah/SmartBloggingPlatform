@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.smartblog.ui.view.comments.CommentListController"
+      spacing="10" style="-fx-padding: 12;">
+    <HBox spacing="8">
+        <Label text="Post ID:"/>
+        <TextField fx:id="postIdField" promptText="e.g. 1" prefWidth="120"/>
+        <Button text="Load" fx:id="loadBtn"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Add Comment" fx:id="addBtn"/>
+    </HBox>
+
+    <TableView fx:id="table" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="80"/>
+            <TableColumn fx:id="colUser" text="User" prefWidth="120"/>
+            <TableColumn fx:id="colContent" text="Content" prefWidth="480"/>
+            <TableColumn fx:id="colCreated" text="Created" prefWidth="160"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="8">
+        <Button text="Edit" fx:id="editBtn"/>
+        <Button text="Delete" fx:id="deleteBtn" style="-fx-text-fill: -color-danger;"/>
+    </HBox>
+</VBox>

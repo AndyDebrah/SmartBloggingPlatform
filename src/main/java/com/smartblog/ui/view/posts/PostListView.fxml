@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.smartblog.ui.view.posts.PostListController" spacing="12" style="-fx-padding: 16;" styleClass="content-area">
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Label text="Posts" styleClass="heading-2" />
+        <Button text="Back" fx:id="backBtn" />
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="searchField" promptText="Search posts..." />
+        <Button text="New Post" fx:id="newBtn" />
+    </HBox>
+
+    <TableView fx:id="postsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idCol" text="#" prefWidth="60" />
+            <TableColumn fx:id="titleCol" text="Title" prefWidth="400" />
+            <TableColumn fx:id="authorCol" text="Author" prefWidth="150" />
+            <TableColumn fx:id="publishedCol" text="Published" prefWidth="100" />
+            <TableColumn fx:id="actionsCol" text="Actions" prefWidth="180" />
+        </columns>
+    </TableView>
+
+</VBox>

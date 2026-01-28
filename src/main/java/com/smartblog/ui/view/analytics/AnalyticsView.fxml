@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.smartblog.ui.view.analytics.AnalyticsController"
+      spacing="12" style="-fx-padding: 12;">
+    <HBox spacing="20">
+        <TitledPane text="Totals" expanded="true">
+            <VBox spacing="6" style="-fx-padding:10;">
+                <Label fx:id="totalPostsLbl"/>
+                <Label fx:id="totalCommentsLbl"/>
+            </VBox>
+        </TitledPane>
+        <TitledPane text="Post Status" expanded="true">
+            <PieChart fx:id="statusChart" prefWidth="400" prefHeight="260"/>
+        </TitledPane>
+        <TitledPane text="Top Tags" expanded="true">
+            <PieChart fx:id="topTagsChart" prefWidth="400" prefHeight="260"/>
+        </TitledPane>
+    </HBox>
+    <TitledPane text="Posts per Month" expanded="true">
+        <LineChart fx:id="postsPerMonth" prefHeight="300">
+            <xAxis><CategoryAxis label="Month"/></xAxis>
+            <yAxis><NumberAxis label="Posts"/></yAxis>
+        </LineChart>
+    </TitledPane>
+</VBox>

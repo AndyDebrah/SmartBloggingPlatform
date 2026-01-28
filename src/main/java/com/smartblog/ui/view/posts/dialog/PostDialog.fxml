@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.smartblog.ui.view.posts.dialog.PostDialogController"
+            prefHeight="400.0" prefWidth="700.0" styleClass="card" >
+
+    <VBox spacing="12" AnchorPane.topAnchor="8" AnchorPane.leftAnchor="8" AnchorPane.rightAnchor="8" AnchorPane.bottomAnchor="8">
+        <Label text="Edit Post" styleClass="heading-3" />
+
+        <TextField fx:id="titleField" promptText="Title" />
+
+        <TextArea fx:id="contentArea" prefHeight="240" wrapText="true" />
+
+        <HBox spacing="8" alignment="CENTER_RIGHT">
+            <Label fx:id="statusLabel" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Cancel" fx:id="cancelBtn" />
+            <Button text="Save" fx:id="saveBtn" />
+        </HBox>
+    </VBox>
+
+</AnchorPane>

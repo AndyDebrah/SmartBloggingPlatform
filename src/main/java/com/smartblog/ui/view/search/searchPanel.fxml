@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.smartblog.ui.view.search.SearchPanelController"
+      spacing="12" style="-fx-padding: 16; -fx-background-color: white; -fx-background-radius: 12;">
+    <Label text="SEARCH &amp; FILTER" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #8b93a7;"/>
+
+    <TextField fx:id="keywordField" promptText="Search by keyword..." style="-fx-background-radius: 6;"/>
+
+    <ComboBox fx:id="tagCombo" promptText="Filter by tag" maxWidth="Infinity" style="-fx-background-radius: 6;"/>
+
+    <TextField fx:id="authorField" promptText="Search by author..." style="-fx-background-radius: 6;"/>
+
+    <VBox spacing="4">
+        <Label text="Sort by:" style="-fx-font-size: 12px; -fx-text-fill: #8b93a7;"/>
+        <ComboBox fx:id="sortCombo" maxWidth="Infinity" style="-fx-background-radius: 6;"/>
+    </VBox>
+
+    <HBox spacing="8">
+        <Button fx:id="searchBtn" text="🔍 Search" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button fx:id="clearBtn" text="Clear" style="-fx-background-color: #f8f9fc; -fx-text-fill: #2d3748; -fx-border-color: #e8ecf4; -fx-background-radius: 6;"/>
+    </HBox>
+</VBox>
