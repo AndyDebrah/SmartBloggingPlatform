@@ -76,12 +76,19 @@ public class AppBootstrap {
             var userRepo = new UserRepositoryJdbc(ds);
             var postRepo = new PostRepositoryJdbc(ds);
             var commentRepo = new CommentRepositoryJdbc(ds);
+            com.smartblog.infrastructure.repository.nosql.CommentRepositoryMongo mongoCommentRepo = null;
+            boolean nosqlEnabled = Boolean.parseBoolean(props.getProperty("comments.nosql.enabled", "false"));
+            if (nosqlEnabled) {
+                String uri = props.getProperty("mongodb.uri", "mongodb://localhost:27017");
+                String dbName = props.getProperty("mongodb.database", "smart_blog_nosql");
+                mongoCommentRepo = new com.smartblog.infrastructure.repository.nosql.CommentRepositoryMongo(uri, dbName);
+            }
             var tagRepo = new TagRepositoryJdbc(ds);
 
             // services
             var userService = new UserServiceImpl(userRepo);
             var postService = new PostServiceImpl(postRepo, userRepo, tagRepo);
-            var commentService = new CommentServiceImpl(commentRepo, postRepo, userRepo);
+            var commentService = new CommentServiceImpl(commentRepo, postRepo, userRepo, mongoCommentRepo);
             var tagService = new TagServiceImpl(tagRepo);
 
             return new Context(ds, userRepo, postRepo, commentRepo, tagRepo, userService, postService, commentService, tagService);

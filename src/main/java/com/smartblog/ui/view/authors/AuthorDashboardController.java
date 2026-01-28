@@ -113,53 +113,57 @@ public class AuthorDashboardController {
             private final VBox commentsBox = new VBox(6);
 
             {
-                // Post card styling
+                // Post card styling - Modern gradient background
                 postCard.getStyleClass().add("post-card");
-                postCard.setStyle("-fx-background-color: rgba(255,255,255,0.02); -fx-padding: 16; -fx-background-radius: 8; -fx-border-color: rgba(255,255,255,0.06); -fx-border-radius: 8;");
+                postCard.setStyle("-fx-background-color: linear-gradient(180deg, #1e222a 0%, #1a1d23 100%); -fx-padding: 20; -fx-background-radius: 16; -fx-border-color: #374151; -fx-border-radius: 16; -fx-border-width: 1;");
                 
                 titleLbl.getStyleClass().add("heading-3");
-                titleLbl.setStyle("-fx-font-size: 16px; -fx-font-weight: 600;");
+                titleLbl.setStyle("-fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #ffffff;");
                 metaLbl.getStyleClass().add("muted");
-                metaLbl.setStyle("-fx-font-size: 12px; -fx-padding: 0 0 8 0;");
-                contentView.setPrefHeight(140);
-                contentView.setMaxHeight(140);
+                metaLbl.setStyle("-fx-font-size: 13px; -fx-padding: 4 0 12 0; -fx-text-fill: #94a3b8;");
+                contentView.setPrefHeight(160);
+                contentView.setMaxHeight(160);
                 contentView.getStyleClass().add("post-content");
                 
-                // CRITICAL: Make WebView background dark to match theme
-                contentView.setStyle("-fx-background-color: #2b2d30; -fx-border-color: rgba(255,255,255,0.05); -fx-border-radius: 4;");
-                contentView.getEngine().setUserStyleSheetLocation("data:,body{background-color:%232b2d30!important;color:%23e0e0e0!important;margin:12px;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}p{margin:0 0 8px 0;}h1,h2,h3{margin:0 0 8px 0;color:%23f0f0f0;}a{color:%2364b5f6;text-decoration:none;}code{background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:3px;}pre{background:rgba(255,255,255,0.05);padding:12px;border-radius:4px;overflow-x:auto;}");
+                // CRITICAL: Make WebView background dark with HIGH CONTRAST white text
+                contentView.setStyle("-fx-background-color: #1a1d23; -fx-border-color: #374151; -fx-border-radius: 8; -fx-border-width: 1;");
+                contentView.getEngine().setUserStyleSheetLocation("data:,body{background-color:%231a1d23!important;color:%23ffffff!important;margin:16px;padding:0;font-family:'Segoe UI','Inter',system-ui,sans-serif;font-size:15px;line-height:1.7;}p{margin:0 0 12px 0;color:%23ffffff;}h1,h2,h3{margin:0 0 12px 0;color:%23ffffff;font-weight:700;}h1{font-size:24px;}h2{font-size:20px;}h3{font-size:16px;}a{color:%236366f1;text-decoration:none;}a:hover{text-decoration:underline;}code{background:%232a2f3a;color:%23a5b4fc;padding:3px 8px;border-radius:4px;font-size:13px;}pre{background:%232a2f3a;color:%23e2e8f0;padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.5;}ul,ol{color:%23ffffff;padding-left:24px;}li{margin-bottom:6px;}blockquote{border-left:3px solid %236366f1;padding-left:16px;margin:12px 0;color:%2394a3b8;}strong{color:%23ffffff;font-weight:600;}em{color:%23e2e8f0;}");
                 
-                // Icon bar setup
+                // Icon bar setup - More vibrant button styles
                 editBtn.getStyleClass().addAll("btn", "btn-secondary");
-                editBtn.setStyle("-fx-font-size: 12px;");
+                editBtn.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffff;");
                 publishBtn.getStyleClass().addAll("btn", "btn-primary");
-                publishBtn.setStyle("-fx-font-size: 12px;");
+                publishBtn.setStyle("-fx-font-size: 13px;");
                 commentIconBtn.getStyleClass().addAll("btn", "btn-icon");
+                commentIconBtn.setStyle("-fx-text-fill: #e2e8f0;");
                 viewCommentsBtn.getStyleClass().addAll("btn", "btn-icon");
+                viewCommentsBtn.setStyle("-fx-text-fill: #e2e8f0;");
                 commentCountLbl.getStyleClass().add("muted");
-                commentCountLbl.setStyle("-fx-font-size: 11px;");
+                commentCountLbl.setStyle("-fx-font-size: 12px; -fx-text-fill: #94a3b8;");
                 Region spacer1 = new Region();
                 HBox.setHgrow(spacer1, javafx.scene.layout.Priority.ALWAYS);
                 iconBar.getChildren().addAll(editBtn, publishBtn, commentIconBtn, viewCommentsBtn, spacer1, commentCountLbl);
-                iconBar.setStyle("-fx-padding: 8 0 0 0;");
+                iconBar.setStyle("-fx-padding: 12 0 0 0;");
                 
                 // Comment input area setup
                 commentTextArea.setPromptText("Write your comment...");
                 commentTextArea.setPrefRowCount(3);
                 commentTextArea.setWrapText(true);
+                commentTextArea.setStyle("-fx-text-fill: #ffffff; -fx-background-color: #1e222a; -fx-border-color: #4b5563;");
                 sendBtn.getStyleClass().addAll("btn", "btn-primary");
                 cancelBtn.getStyleClass().addAll("btn", "btn-secondary");
+                cancelBtn.setStyle("-fx-text-fill: #ffffff;");
                 commentActions.getChildren().addAll(sendBtn, cancelBtn);
                 commentInputArea.getChildren().addAll(commentTextArea, commentActions);
                 commentInputArea.setVisible(false);
                 commentInputArea.setManaged(false);
-                commentInputArea.setStyle("-fx-padding: 8 0 0 0;");
+                commentInputArea.setStyle("-fx-padding: 12 0 0 0;");
                 
-                // Comments display area setup
+                // Comments display area setup - Modern glass-like styling
                 commentsDisplayArea.getChildren().add(commentsBox);
                 commentsDisplayArea.setVisible(false);
                 commentsDisplayArea.setManaged(false);
-                commentsDisplayArea.setStyle("-fx-padding: 12; -fx-background-color: rgba(0,0,0,0.1); -fx-background-radius: 6;");
+                commentsDisplayArea.setStyle("-fx-padding: 16; -fx-background-color: linear-gradient(180deg, rgba(30,34,42,0.95) 0%, rgba(26,29,35,0.95) 100%); -fx-background-radius: 12; -fx-border-color: #374151; -fx-border-radius: 12; -fx-border-width: 1;");
                 
                 // Assemble card
                 postCard.getChildren().addAll(titleLbl, metaLbl, contentView, sep, iconBar, commentInputArea, commentsDisplayArea);
@@ -251,35 +255,36 @@ public class AuthorDashboardController {
                     commentsBox.getChildren().clear();
                     if (list.isEmpty()) {
                         Label noComments = new Label("No comments yet. Be the first to comment!");
-                        noComments.getStyleClass().add("muted");
+                        noComments.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 14px;");
                         commentsBox.getChildren().add(noComments);
                     } else {
                         for (CommentDTO c : list) {
-                            VBox commentItem = new VBox(4);
-                            commentItem.setStyle("-fx-padding: 8; -fx-background-color: rgba(255,255,255,0.02); -fx-background-radius: 4;");
+                            VBox commentItem = new VBox(6);
+                            commentItem.setStyle("-fx-padding: 14; -fx-background-color: linear-gradient(180deg, rgba(42,47,58,0.8) 0%, rgba(36,40,48,0.8) 100%); -fx-background-radius: 10; -fx-border-color: #374151; -fx-border-radius: 10; -fx-border-width: 1;");
                             
                             Label authorLbl = new Label(c.commenterUsername());
-                            authorLbl.setStyle("-fx-font-weight: 600; -fx-font-size: 12px;");
+                            authorLbl.setStyle("-fx-font-weight: 700; -fx-font-size: 14px; -fx-text-fill: #ffffff;");
                             
                             Label contentLbl = new Label(c.content());
                             contentLbl.setWrapText(true);
-                            contentLbl.setStyle("-fx-font-size: 13px;");
+                            contentLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #e2e8f0; -fx-padding: 4 0 8 0;");
                             
                             HBox commentFooter = new HBox(8);
                             Label timeLbl = new Label(c.createdAt() != null ? c.createdAt().toString() : "");
-                            timeLbl.getStyleClass().add("muted");
-                            timeLbl.setStyle("-fx-font-size: 10px;");
+                            timeLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b;");
                             
                             Button reviewBtn = new Button("✓ Review");
                             reviewBtn.getStyleClass().addAll("btn", "btn-icon");
-                            reviewBtn.setStyle("-fx-font-size: 10px; -fx-padding: 4 8;");
+                            reviewBtn.setStyle("-fx-font-size: 11px; -fx-padding: 6 10; -fx-text-fill: #a5b4fc; -fx-background-color: rgba(99,102,241,0.15); -fx-border-color: rgba(99,102,241,0.3); -fx-background-radius: 6; -fx-border-radius: 6;");
                             reviewBtn.setOnAction(ev -> {
-                                if (contentLbl.getStyleClass().contains("muted")) {
-                                    contentLbl.getStyleClass().remove("muted");
+                                if (contentLbl.getStyle().contains("#64748b")) {
+                                    contentLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #e2e8f0; -fx-padding: 4 0 8 0;");
                                     reviewBtn.setText("✓ Review");
+                                    reviewBtn.setStyle("-fx-font-size: 11px; -fx-padding: 6 10; -fx-text-fill: #a5b4fc; -fx-background-color: rgba(99,102,241,0.15); -fx-border-color: rgba(99,102,241,0.3); -fx-background-radius: 6; -fx-border-radius: 6;");
                                 } else {
-                                    contentLbl.getStyleClass().add("muted");
+                                    contentLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #64748b; -fx-padding: 4 0 8 0;");
                                     reviewBtn.setText("✓ Reviewed");
+                                    reviewBtn.setStyle("-fx-font-size: 11px; -fx-padding: 6 10; -fx-text-fill: #86efac; -fx-background-color: rgba(34,197,94,0.15); -fx-border-color: rgba(34,197,94,0.3); -fx-background-radius: 6; -fx-border-radius: 6;");
                                 }
                             });
                             

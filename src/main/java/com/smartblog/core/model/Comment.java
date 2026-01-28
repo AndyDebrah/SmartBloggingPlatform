@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
  */
 public class Comment {
 
-    private Long id;
-    private Long postId;
-    private Long userId;
+    private int id;
+    private int postId;
+    private int userId;
+    private String mongoId;
     private String content;
 
     private LocalDateTime createdAt;
@@ -23,7 +24,7 @@ public class Comment {
 
     public Comment() {}
 
-    public Comment(Long id, Long postId, Long userId, String content,
+    public Comment(int id, int postId, int userId, String content,
                    LocalDateTime createdAt, LocalDateTime deletedAt) {
         this.id = id;
         this.postId = postId;
@@ -33,27 +34,29 @@ public class Comment {
         this.deletedAt = deletedAt;
     }
 
-    public Comment(Long postId, Long userId, String content) {
-        this(null, postId, userId, content, null, null);
+    public Comment(int postId, int userId, String content) {
+        this(0, postId, userId, content, null, null);
     }
 
-    public Long getId() { return id; }
+    public int getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(int id) { this.id = id; }
 
-    public int getCommentId() { return id == null ? 0 : id.intValue(); }
+    public int getCommentId() { return id; }
 
-    public void setCommentId(int commentId) { this.id = (long) commentId; }
+    public void setCommentId(int commentId) { this.id = commentId; }
 
-    public int getPostId() { return postId == null ? 0 : postId.intValue(); }
+    public int getPostId() { return postId; }
 
-    public void setPostId(int postId) { this.postId = (long) postId; }
+    public void setPostId(int postId) { this.postId = postId; }
 
-    public void setPostId(Long postId) { this.postId = postId; }
+    public int getUserId() { return userId; }
 
-    public int getUserId() { return userId == null ? 0 : userId.intValue(); }
+    public void setUserId(int userId) { this.userId = userId; }
 
-    public void setUserId(int userId) { this.userId = (long) userId; }
+    public String getMongoId() { return mongoId; }
+
+    public void setMongoId(String mongoId) { this.mongoId = mongoId; }
 
     public String getContent() { return content; }
 

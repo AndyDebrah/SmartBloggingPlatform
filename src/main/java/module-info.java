@@ -11,6 +11,11 @@ module SmartBloggingPlatform {
     requires com.zaxxer.hikari;
     requires org.slf4j;
 
+    // MongoDB driver (automatic module names)
+    requires org.mongodb.driver.sync.client;
+    requires org.mongodb.driver.core;
+    requires org.mongodb.bson;
+
     opens com.smartblog.core.demo to javafx.fxml;
 
     // OPEN UI packages to FXML

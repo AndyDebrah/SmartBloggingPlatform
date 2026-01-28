@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -55,6 +56,37 @@ public class PerformanceController {
         // Use explicit cell value factories to support record accessors
         testNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue() != null ? cell.getValue().testName() : ""));
         durationColumn.setCellValueFactory(cell -> new SimpleDoubleProperty(cell.getValue() != null ? cell.getValue().durationMs() : 0.0).asObject());
+
+        // Custom cell factories for dark theme styling
+        testNameColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    setStyle("-fx-text-fill: #ffffff; -fx-font-size: 13px; -fx-padding: 12 16;");
+                }
+            }
+        });
+
+        durationColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(String.format("%.3f", item));
+                    // Color code based on performance
+                    String color = item < 10 ? "#22c55e" : (item < 50 ? "#f59e0b" : "#ef4444");
+                    setStyle("-fx-text-fill: " + color + "; -fx-font-size: 13px; -fx-font-weight: 600; -fx-padding: 12 16; -fx-alignment: center-right;");
+                }
+            }
+        });
 
         exportBtn.setDisable(true);
         progressIndicator.setVisible(false);

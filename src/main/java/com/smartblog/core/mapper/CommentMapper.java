@@ -11,13 +11,15 @@ import com.smartblog.core.model.User;
 public final class CommentMapper {
     private CommentMapper() {}
     public static CommentDTO toDTO(Comment c, User commenter) {
-        Long postId = c.getPostId() == 0 ? null : Long.valueOf(c.getPostId());
+        Long id = c.getId() == 0 ? null : Long.valueOf(c.getId());
+        Long postId = Long.valueOf(c.getPostId());
         return new CommentDTO(
-                c.getId(),
+            id,
             postId,
-                commenter != null ? commenter.getUsername() : null,
-                c.getContent(),
-                c.getCreatedAt()
+            commenter != null ? commenter.getUsername() : null,
+            c.getContent(),
+            c.getCreatedAt(),
+            c.getMongoId()
         );
     }
 }

@@ -1,14 +1,18 @@
 
 package com.smartblog.infrastructure.repository.jdbc;
 
-import com.smartblog.core.model.Comment;
-import com.smartblog.infrastructure.repository.api.CommentRepository;
-
-import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.sql.DataSource;
+
+import com.smartblog.core.model.Comment;
+import com.smartblog.infrastructure.repository.api.CommentRepository;
 
 public class CommentRepositoryJdbc implements CommentRepository {
     private final DataSource ds;
@@ -66,8 +70,8 @@ public class CommentRepositoryJdbc implements CommentRepository {
 
     private Comment map(ResultSet rs) throws SQLException {
         Comment c = new Comment();
-        c.setId(rs.getLong("id"));
-        c.setPostId(rs.getLong("post_id"));
+        c.setId((int) rs.getLong("id"));
+        c.setPostId((int) rs.getLong("post_id"));
         c.setUserId((int) rs.getLong("user_id"));
         c.setContent(rs.getString("content"));
         Timestamp ct = rs.getTimestamp("created_at");

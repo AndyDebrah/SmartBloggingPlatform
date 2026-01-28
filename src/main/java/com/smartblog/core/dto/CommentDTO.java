@@ -12,5 +12,6 @@ public record CommentDTO(
         Long postId,
         String commenterUsername,
         String content,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        String mongoId
 ) {}

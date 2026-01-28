@@ -1,13 +1,59 @@
-/* Author dashboard overrides - increase contrast for sidebar labels */
+/* Author Dashboard Overrides - High Contrast Text */
+
+/* Sidebar labels - bright white for maximum visibility */
 .author-sidebar .label {
-    -fx-text-fill: #334155; /* darker secondary */
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 500;
 }
-.author-sidebar .label[style*="-fx-font-size: 11px"] {
-    -fx-text-fill: #334155;
+
+.author-sidebar .heading-2,
+.author-sidebar .heading-3,
+.author-sidebar .heading-4 {
+    -fx-text-fill: #ffffff;
 }
-.author-sidebar .text-field, .author-sidebar .combo-box, .author-sidebar .button {
-    -fx-text-fill: #0b1220;
+
+/* Input fields in sidebar */
+.author-sidebar .text-field,
+.author-sidebar .combo-box,
+.author-sidebar .button {
+    -fx-text-fill: #ffffff;
 }
+
+.author-sidebar .text-field {
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+/* Main content area labels */
+.author-root .label {
+    -fx-text-fill: #ffffff;
+}
+
 .author-root .label.heading-1 {
-    -fx-text-fill: -fx-text-fill; /* keep existing */
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+}
+
+/* Muted text should still be visible */
+.author-root .muted {
+    -fx-text-fill: #94a3b8;
+}
+
+/* Post card text */
+.post-card .label {
+    -fx-text-fill: #ffffff;
+}
+
+/* List cells */
+.author-sidebar .list-cell {
+    -fx-text-fill: #e2e8f0;
+}
+
+.author-sidebar .list-cell:selected {
+    -fx-text-fill: #ffffff;
+}
+
+/* Search panel */
+.search-panel .label {
+    -fx-text-fill: #ffffff;
 }

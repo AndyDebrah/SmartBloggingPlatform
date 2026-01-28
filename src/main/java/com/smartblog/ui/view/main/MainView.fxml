@@ -6,70 +6,80 @@
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.smartblog.ui.view.main.MainController"
-            prefWidth="1400" prefHeight="900">
+            prefWidth="1400" prefHeight="900"
+            style="-fx-background-color: #12151a;">
     
-    <!-- Top Bar -->
+    <!-- Top Bar - Modern Gradient Header -->
     <top>
-        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="16">
-            <Button fx:id="backBtn" text="← Back" styleClass="button-secondary"/>
-            <Label text="SmartBlog Dashboard" styleClass="heading-3"/>
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color: linear-gradient(90deg, #1a1d23 0%, #242830 100%); -fx-padding: 16 24; -fx-border-color: transparent transparent #374151 transparent; -fx-border-width: 0 0 1 0;">
+            <Button fx:id="backBtn" text="← Back" 
+                    style="-fx-background-color: rgba(255,255,255,0.08); -fx-text-fill: #ffffff; -fx-border-color: #4b5563; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-weight: 600;"/>
+            <Label text="SmartBlog Dashboard" 
+                   style="-fx-font-size: 20px; -fx-font-weight: 700; -fx-text-fill: #ffffff;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="+ New Post" styleClass="button-primary" fx:id="newPostBtn"/>
-            <Label fx:id="userLabel" styleClass="text-secondary"/>
-            <Button text="Logout" fx:id="logoutBtn"/>
+            <Button text="+ New Post" fx:id="newPostBtn"
+                    style="-fx-background-color: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%); -fx-text-fill: #ffffff; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 20; -fx-font-weight: 700; -fx-font-size: 14px;"/>
+            <Label fx:id="userLabel" style="-fx-text-fill: #e2e8f0; -fx-font-size: 14px;"/>
+            <Button text="Logout" fx:id="logoutBtn"
+                    style="-fx-background-color: rgba(239,68,68,0.15); -fx-text-fill: #fca5a5; -fx-border-color: rgba(239,68,68,0.3); -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-weight: 600;"/>
         </HBox>
     </top>
     
     <!-- Main Content with Sidebar -->
     <center>
-        <HBox>
+        <HBox style="-fx-background-color: #12151a;">
             <!-- Sidebar Navigation (hidden for minimal landing) -->
-            <VBox styleClass="sidebar" prefWidth="240" spacing="8" visible="false" managed="false">
+            <VBox prefWidth="260" spacing="8" visible="false" managed="false"
+                  style="-fx-background-color: linear-gradient(180deg, #1a1d23 0%, #12151a 100%); -fx-border-color: transparent #2d3748 transparent transparent; -fx-border-width: 0 1 0 0;">
                 <padding>
                     <Insets top="24" bottom="24" left="16" right="16"/>
                 </padding>
                 
-                <Label text="NAVIGATION" styleClass="text-muted"
-                       style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-padding: 8 8 4 8;"/>
+                <Label text="NAVIGATION" 
+                       style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #64748b; -fx-padding: 8 8 4 8;"/>
                 
                 <Button fx:id="dashboardBtn" text="📊 Dashboard"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
                 <Button fx:id="postsBtn" text="📝 Posts"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
                 <Button fx:id="commentsBtn" text="💬 Comments"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
                 <Button fx:id="tagsBtn" text="🏷️ Tags"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
                 <Button fx:id="usersBtn" text="👥 Users"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
                 <Button fx:id="analyticsBtn" text="📈 Analytics"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
                 
-                <Separator style="-fx-padding: 16 0;"/>
+                <Separator style="-fx-padding: 16 0; -fx-background-color: #374151;"/>
                 
-                <Label text="QUICK ACTIONS" styleClass="text-muted"
-                       style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-padding: 8 8 4 8;"/>
+                <Label text="QUICK ACTIONS" 
+                       style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #64748b; -fx-padding: 8 8 4 8;"/>
                 
                 <Button text="✏️ Write Post"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
                 <Button text="⚙️ Settings"
-                        style="-fx-alignment: center-left; -fx-padding: 12 16;"
+                        style="-fx-alignment: center-left; -fx-padding: 14 16; -fx-background-color: transparent; -fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
                         maxWidth="Infinity"/>
             </VBox>
             
             <!-- Content Area (minimal landing) -->
-            <StackPane fx:id="contentArea" styleClass="content-area" HBox.hgrow="ALWAYS">
-                <VBox alignment="CENTER" spacing="12">
-                    <Label text="Welcome to SmartBlog" styleClass="heading-1"/>
+            <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS"
+                       style="-fx-background-color: #12151a; -fx-padding: 32;">
+                <VBox alignment="CENTER" spacing="16">
+                    <Label text="Welcome to SmartBlog" 
+                           style="-fx-font-size: 32px; -fx-font-weight: 700; -fx-text-fill: #ffffff;"/>
                     <Label text="This is a minimal landing page. Use the Admin or Author dashboards for management."
-                           styleClass="text-secondary" wrapText="true" maxWidth="800"/>
+                           wrapText="true" maxWidth="800"
+                           style="-fx-font-size: 16px; -fx-text-fill: #94a3b8;"/>
                 </VBox>
             </StackPane>
         </HBox>
