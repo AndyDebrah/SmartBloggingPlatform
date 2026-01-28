@@ -28,10 +28,10 @@ public class PerformanceBenchmark {
         T result = operation.get();
         long endTime = System.nanoTime();
 
-        long durationMs = (endTime - startTime) / 1_000_000;
+        double durationMs = (endTime - startTime) / 1_000_000.0;
         results.add(new BenchmarkResult(testName, durationMs));
 
-        System.out.println("[BENCHMARK] " + testName + " took " + durationMs + " ms");
+        System.out.println(String.format("[BENCHMARK] %s took %.3f ms", testName, durationMs));
         return result;
     }
 
@@ -52,20 +52,20 @@ public class PerformanceBenchmark {
      * @param iterations Number of times to run the test
      */
     public <T> T recordAverage(String testName, Supplier<T> operation, int iterations) {
-        long totalDuration = 0;
+        long totalNanos = 0;
         T result = null;
 
         for (int i = 0; i < iterations; i++) {
             long startTime = System.nanoTime();
             result = operation.get();
             long endTime = System.nanoTime();
-            totalDuration += (endTime - startTime);
+            totalNanos += (endTime - startTime);
         }
 
-        long avgDurationMs = (totalDuration / iterations) / 1_000_000;
+        double avgDurationMs = (totalNanos / (double) iterations) / 1_000_000.0;
         results.add(new BenchmarkResult(testName + " (avg of " + iterations + " runs)", avgDurationMs));
 
-        System.out.println("[BENCHMARK] " + testName + " average: " + avgDurationMs + " ms");
+        System.out.println(String.format("[BENCHMARK] %s average: %.3f ms", testName, avgDurationMs));
         return result;
     }
 
@@ -93,10 +93,10 @@ public class PerformanceBenchmark {
     /**
      * Result of a single benchmark test.
      */
-    public record BenchmarkResult(String testName, long durationMs) {
+    public record BenchmarkResult(String testName, double durationMs) {
         @Override
         public String toString() {
-            return String.format("%-50s %6d ms", testName, durationMs);
+            return String.format("%-50s %8.3f ms", testName, durationMs);
         }
     }
 
@@ -114,24 +114,24 @@ public class PerformanceBenchmark {
             return results;
         }
 
-        public long getTotalDuration() {
-            return results.stream().mapToLong(BenchmarkResult::durationMs).sum();
+        public double getTotalDuration() {
+            return results.stream().mapToDouble(BenchmarkResult::durationMs).sum();
         }
 
         public double getAverageDuration() {
             if (results.isEmpty()) return 0;
-            return (double) getTotalDuration() / results.size();
+            return getTotalDuration() / results.size();
         }
 
         public BenchmarkResult getSlowest() {
             return results.stream()
-                    .max((a, b) -> Long.compare(a.durationMs(), b.durationMs()))
+                    .max((a, b) -> Double.compare(a.durationMs(), b.durationMs()))
                     .orElse(null);
         }
 
         public BenchmarkResult getFastest() {
             return results.stream()
-                    .min((a, b) -> Long.compare(a.durationMs(), b.durationMs()))
+                    .min((a, b) -> Double.compare(a.durationMs(), b.durationMs()))
                     .orElse(null);
         }
 
@@ -153,19 +153,19 @@ public class PerformanceBenchmark {
 
             sb.append("Summary Statistics:\n");
             sb.append(String.format("  Total tests:      %d\n", results.size()));
-            sb.append(String.format("  Total duration:   %d ms\n", getTotalDuration()));
-            sb.append(String.format("  Average duration: %.2f ms\n", getAverageDuration()));
+            sb.append(String.format("  Total duration:   %.3f ms\n", getTotalDuration()));
+            sb.append(String.format("  Average duration: %.3f ms\n", getAverageDuration()));
 
             BenchmarkResult slowest = getSlowest();
             if (slowest != null) {
-                sb.append(String.format("  Slowest test:     %s (%d ms)\n",
-                        slowest.testName(), slowest.durationMs()));
+                sb.append(String.format("  Slowest test:     %s (%.3f ms)\n",
+                    slowest.testName(), slowest.durationMs()));
             }
 
             BenchmarkResult fastest = getFastest();
             if (fastest != null) {
-                sb.append(String.format("  Fastest test:     %s (%d ms)\n",
-                        fastest.testName(), fastest.durationMs()));
+                sb.append(String.format("  Fastest test:     %s (%.3f ms)\n",
+                    fastest.testName(), fastest.durationMs()));
             }
 
             sb.append("\n").append("=".repeat(80)).append("\n");

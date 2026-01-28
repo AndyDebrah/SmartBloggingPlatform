@@ -10,7 +10,7 @@ import com.smartblog.application.service.PostService;
 import com.smartblog.application.service.TagService;
 import com.smartblog.application.util.PerformanceBenchmark.BenchmarkResult;
 
-import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -26,7 +26,7 @@ public class PerformanceController {
 
     @FXML private TableView<BenchmarkResult> resultsTable;
     @FXML private TableColumn<BenchmarkResult, String> testNameColumn;
-    @FXML private TableColumn<BenchmarkResult, Long> durationColumn;
+    @FXML private TableColumn<BenchmarkResult, Double> durationColumn;
 
     @FXML private Label totalTestsLbl;
     @FXML private Label totalDurationLbl;
@@ -54,7 +54,7 @@ public class PerformanceController {
     public void initialize() {
         // Use explicit cell value factories to support record accessors
         testNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue() != null ? cell.getValue().testName() : ""));
-        durationColumn.setCellValueFactory(cell -> new SimpleLongProperty(cell.getValue() != null ? cell.getValue().durationMs() : 0L).asObject());
+        durationColumn.setCellValueFactory(cell -> new SimpleDoubleProperty(cell.getValue() != null ? cell.getValue().durationMs() : 0.0).asObject());
 
         exportBtn.setDisable(true);
         progressIndicator.setVisible(false);
@@ -102,17 +102,17 @@ public class PerformanceController {
         resultsTable.setItems(vm.getResults());
 
         totalTestsLbl.setText(String.valueOf(vm.getTotalTests()));
-        totalDurationLbl.setText(vm.getTotalDuration() + " ms");
-        avgDurationLbl.setText(String.format("%.2f ms", vm.getAverageDuration()));
+        totalDurationLbl.setText(String.format("%.3f ms", vm.getTotalDuration()));
+        avgDurationLbl.setText(String.format("%.3f ms", vm.getAverageDuration()));
 
         BenchmarkResult slowest = vm.getSlowestTest();
         if (slowest != null) {
-            slowestTestLbl.setText(slowest.testName() + " (" + slowest.durationMs() + " ms)");
+            slowestTestLbl.setText(String.format("%s (%.3f ms)", slowest.testName(), slowest.durationMs()));
         }
 
         BenchmarkResult fastest = vm.getFastestTest();
         if (fastest != null) {
-            fastestTestLbl.setText(fastest.testName() + " (" + fastest.durationMs() + " ms)");
+            fastestTestLbl.setText(String.format("%s (%.3f ms)", fastest.testName(), fastest.durationMs()));
         }
     }
 
@@ -147,17 +147,17 @@ public class PerformanceController {
             resultsTable.setItems(items);
 
             // Update summary based on combined
-            long total = lastCombinedResults.stream().mapToLong(BenchmarkResult::durationMs).sum();
-            double avg = lastCombinedResults.isEmpty() ? 0 : (double) total / lastCombinedResults.size();
+            double total = lastCombinedResults.stream().mapToDouble(BenchmarkResult::durationMs).sum();
+            double avg = lastCombinedResults.isEmpty() ? 0 : total / lastCombinedResults.size();
             totalTestsLbl.setText(String.valueOf(lastCombinedResults.size()));
-            totalDurationLbl.setText(total + " ms");
-            avgDurationLbl.setText(String.format("%.2f ms", avg));
+            totalDurationLbl.setText(String.format("%.3f ms", total));
+            avgDurationLbl.setText(String.format("%.3f ms", avg));
 
-            BenchmarkResult slowest = lastCombinedResults.stream().max((a,b)->Long.compare(a.durationMs(), b.durationMs())).orElse(null);
-            if (slowest != null) slowestTestLbl.setText(slowest.testName() + " (" + slowest.durationMs() + " ms)");
+            BenchmarkResult slowest = lastCombinedResults.stream().max((a,b)->Double.compare(a.durationMs(), b.durationMs())).orElse(null);
+            if (slowest != null) slowestTestLbl.setText(String.format("%s (%.3f ms)", slowest.testName(), slowest.durationMs()));
 
-            BenchmarkResult fastest = lastCombinedResults.stream().min((a,b)->Long.compare(a.durationMs(), b.durationMs())).orElse(null);
-            if (fastest != null) fastestTestLbl.setText(fastest.testName() + " (" + fastest.durationMs() + " ms)");
+            BenchmarkResult fastest = lastCombinedResults.stream().min((a,b)->Double.compare(a.durationMs(), b.durationMs())).orElse(null);
+            if (fastest != null) fastestTestLbl.setText(String.format("%s (%.3f ms)", fastest.testName(), fastest.durationMs()));
 
             exportBtn.setDisable(false);
             progressIndicator.setVisible(false);
@@ -188,8 +188,28 @@ public class PerformanceController {
                 if (lastCombinedResults != null) {
                     // Build a simple report for combined cold+warm results
                     writer.write("PERFORMANCE BENCHMARK REPORT (Cold + Warm)\n\n");
-                    for (BenchmarkResult r : lastCombinedResults) {
-                        writer.write(String.format("%s : %d ms\n", r.testName(), r.durationMs()));
+                    // If we have cold+warm pairs (cold entries followed by warm entries), print deltas
+                    boolean hasPairs = lastCombinedResults.size() % 2 == 0;
+                    if (hasPairs) {
+                        int half = lastCombinedResults.size() / 2;
+                        writer.write(String.format("%-50s %12s %12s %12s %12s\n", "Test", "Cold (ms)", "Warm (ms)", "Delta (ms)", "% change"));
+                        writer.write("".repeat(80) + "\n");
+                        for (int i = 0; i < half; i++) {
+                            BenchmarkResult cold = lastCombinedResults.get(i);
+                            BenchmarkResult warm = lastCombinedResults.get(i + half);
+                            String baseName = cold.testName();
+                            // strip suffixes if present
+                            baseName = baseName.replaceAll(" \\([^)]*\\)$", "");
+                            double coldMs = cold.durationMs();
+                            double warmMs = warm.durationMs();
+                            double delta = warmMs - coldMs;
+                            String pct = coldMs == 0.0 ? "N/A" : String.format("%.2f%%", (delta / coldMs) * 100.0);
+                            writer.write(String.format("%-50s %12.3f %12.3f %12.3f %12s\n", baseName, coldMs, warmMs, delta, pct));
+                        }
+                    } else {
+                        for (BenchmarkResult r : lastCombinedResults) {
+                            writer.write(String.format("%s : %.3f ms\n", r.testName(), r.durationMs()));
+                        }
                     }
                 } else {
                     writer.write(vm.exportReport());

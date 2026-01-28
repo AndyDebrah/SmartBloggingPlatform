@@ -99,7 +99,7 @@ public class PerformanceViewModel {
         return benchmark.size();
     }
 
-    public long getTotalDuration() {
+    public double getTotalDuration() {
         return benchmark.generateReport().getTotalDuration();
     }
 
