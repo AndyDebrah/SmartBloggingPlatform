@@ -25,6 +25,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+/**
+ * Controller for the Author Dashboard view.
+ * Provides listing, searching and inline comment interactions for authors.
+ */
 public class AuthorDashboardController {
 
     @FXML private Label heading;
@@ -34,7 +38,6 @@ public class AuthorDashboardController {
     @FXML private Button newBtn;
     @FXML private Button refreshBtn;
 
-    // Search panel fields
     @FXML private TextField searchKeywordField;
     @FXML private ComboBox<String> searchTagCombo;
     @FXML private TextField searchAuthorField;
@@ -42,7 +45,7 @@ public class AuthorDashboardController {
     @FXML private Button searchExecuteBtn;
     @FXML private Button searchClearBtn;
 
-    // New bindings for improved UI
+    // UI bindings
     @FXML private Label selectedTitle;
     @FXML private Label selectedMeta;
     @FXML private Label selectedContent;
@@ -84,7 +87,7 @@ public class AuthorDashboardController {
             }
         });
 
-        // full posts list (main content) - each cell shows professional post card
+        // full posts list (main content)
         postsFullList.setItems(data);
         postsFullList.setCellFactory(lv -> new ListCell<>() {
             private final VBox postCard = new VBox(12);
@@ -113,7 +116,7 @@ public class AuthorDashboardController {
             private final VBox commentsBox = new VBox(6);
 
             {
-                // Post card styling - Modern gradient background
+                // Post card styling
                 postCard.getStyleClass().add("post-card");
                 postCard.setStyle("-fx-background-color: linear-gradient(180deg, #1e222a 0%, #1a1d23 100%); -fx-padding: 20; -fx-background-radius: 16; -fx-border-color: #374151; -fx-border-radius: 16; -fx-border-width: 1;");
                 
@@ -125,11 +128,10 @@ public class AuthorDashboardController {
                 contentView.setMaxHeight(160);
                 contentView.getStyleClass().add("post-content");
                 
-                // CRITICAL: Make WebView background dark with HIGH CONTRAST white text
                 contentView.setStyle("-fx-background-color: #1a1d23; -fx-border-color: #374151; -fx-border-radius: 8; -fx-border-width: 1;");
                 contentView.getEngine().setUserStyleSheetLocation("data:,body{background-color:%231a1d23!important;color:%23ffffff!important;margin:16px;padding:0;font-family:'Segoe UI','Inter',system-ui,sans-serif;font-size:15px;line-height:1.7;}p{margin:0 0 12px 0;color:%23ffffff;}h1,h2,h3{margin:0 0 12px 0;color:%23ffffff;font-weight:700;}h1{font-size:24px;}h2{font-size:20px;}h3{font-size:16px;}a{color:%236366f1;text-decoration:none;}a:hover{text-decoration:underline;}code{background:%232a2f3a;color:%23a5b4fc;padding:3px 8px;border-radius:4px;font-size:13px;}pre{background:%232a2f3a;color:%23e2e8f0;padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.5;}ul,ol{color:%23ffffff;padding-left:24px;}li{margin-bottom:6px;}blockquote{border-left:3px solid %236366f1;padding-left:16px;margin:12px 0;color:%2394a3b8;}strong{color:%23ffffff;font-weight:600;}em{color:%23e2e8f0;}");
                 
-                // Icon bar setup - More vibrant button styles
+                // Icon bar setup
                 editBtn.getStyleClass().addAll("btn", "btn-secondary");
                 editBtn.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffff;");
                 publishBtn.getStyleClass().addAll("btn", "btn-primary");
@@ -159,7 +161,7 @@ public class AuthorDashboardController {
                 commentInputArea.setManaged(false);
                 commentInputArea.setStyle("-fx-padding: 12 0 0 0;");
                 
-                // Comments display area setup - Modern glass-like styling
+                // Comments display area setup
                 commentsDisplayArea.getChildren().add(commentsBox);
                 commentsDisplayArea.setVisible(false);
                 commentsDisplayArea.setManaged(false);
@@ -168,7 +170,7 @@ public class AuthorDashboardController {
                 // Assemble card
                 postCard.getChildren().addAll(titleLbl, metaLbl, contentView, sep, iconBar, commentInputArea, commentsDisplayArea);
                 
-                // Edit button action - navigate to editor with post ID
+                // Edit button action
                 editBtn.setOnAction(e -> {
                     PostDTO p = getItem();
                     if (p != null) {
@@ -176,7 +178,7 @@ public class AuthorDashboardController {
                     }
                 });
                 
-                // Publish button action - admin can publish any post
+                // Publish button action
                 publishBtn.setOnAction(e -> {
                     PostDTO p = getItem();
                     if (p == null) return;
@@ -202,7 +204,7 @@ public class AuthorDashboardController {
                     if (show) commentTextArea.requestFocus();
                 });
                 
-                // View comments action - toggle display area
+                // View comments action
                 viewCommentsBtn.setOnAction(e -> {
                     boolean show = !commentsDisplayArea.isVisible();
                     commentsDisplayArea.setVisible(show);

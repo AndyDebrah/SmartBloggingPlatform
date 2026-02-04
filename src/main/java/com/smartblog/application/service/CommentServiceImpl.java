@@ -46,13 +46,11 @@ public class CommentServiceImpl implements CommentService {
             ex.printStackTrace();
             throw ex;
         }
-        // set id for downstream consumers and optional NoSQL write
         c.setId(createdId);
         if (mongoComments != null) {
             try {
                 mongoComments.save(c);
             } catch (Exception ex) {
-                // don't fail the request if Mongo write fails; log and continue
                 System.err.println("[CommentService] Warning: failed to write comment to MongoDB: " + ex.getMessage());
                 ex.printStackTrace();
             }
@@ -88,7 +86,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDTO> listForPost(long postId, int page, int size) {
-        // If a Mongo repository is present, prefer it for reads (it stores mysqlId when available).
         List<com.smartblog.core.model.Comment> models;
         if (mongoComments != null) {
             models = mongoComments.listByPost(postId, page, size);

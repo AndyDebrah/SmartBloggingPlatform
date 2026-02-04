@@ -10,6 +10,10 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+/**
+ * Central navigation helper for the JavaFX application.
+ * Manages view loading, history and optional debug fallback handlers.
+ */
 public final class NavigationService {
     private static Stage primaryStage;
     private static boolean dark = false;
@@ -28,9 +32,7 @@ public final class NavigationService {
     }
 
     public static void navigate(View view, ViewParams params) {
-        // push current onto history
         if (currentView != null) history.push(new ViewEntry(currentView, currentParams));
-        // load target
         try {
             System.out.println("[Navigation] Loading view: " + view + " -> " + view.fxml);
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(ViewLoader.class.getResource(view.fxml));

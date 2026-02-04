@@ -42,3 +42,7 @@ application-local.properties
 application-dev.properties
 .env
 *.env
+
+# Performance reports and notes
+performance_report_*.txt
+.consolidation-notes.md

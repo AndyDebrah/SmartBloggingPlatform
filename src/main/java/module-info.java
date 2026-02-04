@@ -35,6 +35,4 @@ module SmartBloggingPlatform {
     exports com.smartblog;
     exports com.smartblog.bootstrap;
     exports com.smartblog.core.model;
-    exports com.smartblog.core.dao;
-    exports com.smartblog.core.dao.impl;
 }

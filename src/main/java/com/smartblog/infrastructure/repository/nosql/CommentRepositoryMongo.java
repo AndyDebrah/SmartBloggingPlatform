@@ -15,8 +15,8 @@ import com.smartblog.core.model.Comment;
 import com.smartblog.infrastructure.nosql.MongoClientFactory;
 
 /**
- * Minimal Mongo-backed repository for comments used during dual-write.
- * Stores MySQL id (mysqlId) when available so MySQL remains source-of-truth.
+ * MongoDB implementation for comment storage supporting dual-write pattern.
+ * Stores mysqlId field for reference tracking when MySQL is the primary source.
  */
 public class CommentRepositoryMongo {
     private final MongoCollection<Document> col;
@@ -26,6 +26,11 @@ public class CommentRepositoryMongo {
         this.col = db.getCollection("comments");
     }
 
+    /**
+     * Saves a comment to MongoDB and updates its mongoId field.
+     * 
+     * @param c comment to save
+     */
     public void save(Comment c) {
         Document d = new Document();
         if (c.getId() > 0) d.append("mysqlId", c.getId());
@@ -50,6 +55,14 @@ public class CommentRepositoryMongo {
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Lists comments for a specific post with pagination.
+     * 
+     * @param postId post identifier
+     * @param page page number (1-based)
+     * @param size page size
+     * @return list of comments
+     */
     public List<Comment> listByPost(long postId, int page, int size) {
         List<Comment> out = new ArrayList<>();
         int offset = Math.max(0, (page - 1) * size);

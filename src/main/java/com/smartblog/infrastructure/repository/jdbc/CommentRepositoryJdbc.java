@@ -14,6 +14,9 @@ import javax.sql.DataSource;
 import com.smartblog.core.model.Comment;
 import com.smartblog.infrastructure.repository.api.CommentRepository;
 
+/**
+ * JDBC implementation of CommentRepository for MySQL persistence.
+ */
 public class CommentRepositoryJdbc implements CommentRepository {
     private final DataSource ds;
     public CommentRepositoryJdbc(DataSource ds) { this.ds = ds; }

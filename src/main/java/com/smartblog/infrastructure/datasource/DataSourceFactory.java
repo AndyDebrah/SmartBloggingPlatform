@@ -9,12 +9,18 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
- * Centralizes HikariCP creation from application properties.
- * In production: one DataSource per app, reused everywhere.
+ * Factory for creating and managing a singleton HikariCP DataSource.
+ * Configures connection pooling from application properties.
  */
 public final class DataSourceFactory {
     private static HikariDataSource ds;
 
+    /**
+     * Gets or creates the singleton DataSource instance.
+     * 
+     * @param props application properties containing database configuration
+     * @return configured DataSource instance
+     */
     public static synchronized DataSource get(Properties props) {
         if (ds != null) return ds;
 
@@ -32,6 +38,9 @@ public final class DataSourceFactory {
         return ds;
     }
 
+    /**
+     * Closes the DataSource if it exists.
+     */
     public static synchronized void close() {
         if (ds != null) ds.close();
     }
