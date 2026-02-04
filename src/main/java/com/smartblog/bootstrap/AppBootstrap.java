@@ -69,6 +69,12 @@ public class AppBootstrap {
                 if (in == null) throw new IllegalStateException("application.properties not found");
                 props.load(in);
             }
+            // Load local overrides if present (for development)
+            try (InputStream localIn = AppBootstrap.class.getClassLoader().getResourceAsStream("application-local.properties")) {
+                if (localIn != null) {
+                    props.load(localIn);
+                }
+            }
             DataSource ds = DataSourceFactory.get(props);
             MigrationRunner.migrate(ds, props);
 
