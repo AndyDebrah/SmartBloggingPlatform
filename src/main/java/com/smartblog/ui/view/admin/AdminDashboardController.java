@@ -83,9 +83,9 @@ public class AdminDashboardController {
             private final Label titleLabel = new Label();
             private final Label metaLabel = new Label();
             private final HBox actionBar = new HBox(12);
-            private final Button publishBtn = new Button("📢 Publish");
-            private final Button editBtn = new Button("✏️ Edit");
-            private final Label statusLabel = new Label("📝 Draft");
+            private final Button publishBtn = new Button("ðŸ“¢ Publish");
+            private final Button editBtn = new Button("âœï¸ Edit");
+            private final Label statusLabel = new Label("ðŸ“ Draft");
             
             {
                 // Card styling
@@ -125,7 +125,7 @@ public class AdminDashboardController {
                     setGraphic(null);
                 } else {
                     titleLabel.setText(item.title());
-                    metaLabel.setText("by " + item.authorUsername() + " • " + getCommentCount(item) + " comments");
+                    metaLabel.setText("by " + item.authorUsername() + " â€¢ " + getCommentCount(item) + " comments");
                     setGraphic(card);
                 }
             }

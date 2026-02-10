@@ -4,222 +4,200 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Spring Boot Parent POM - manages all Spring Boot dependencies -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.2</version>
+        <relativePath/>
+    </parent>
+
     <groupId>com.smartblog</groupId>
     <artifactId>SmartBloggingPlatform</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>SmartBloggingPlatform</name>
+    <description>Smart Blogging Platform REST API with Spring Boot</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.12.1</junit.version>
+        <java.version>21</java.version>
+        <springdoc.version>2.3.0</springdoc.version>
+        <mongodb.driver.version>4.11.1</mongodb.driver.version>
+
     </properties>
 
     <dependencies>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SPRING BOOT STARTERS (Core Framework)                           -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- Spring Boot Web: REST Controllers, Embedded Tomcat, Jackson JSON -->
         <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>21.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>21.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>21.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>21.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>21.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.controlsfx</groupId>
-            <artifactId>controlsfx</artifactId>
-            <version>11.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dlsc.formsfx</groupId>
-            <artifactId>formsfx-core</artifactId>
-            <version>11.6.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.synedra</groupId>
-            <artifactId>validatorfx</artifactId>
-            <version>0.6.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-javafx</artifactId>
-            <version>12.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kordamp.bootstrapfx</groupId>
-            <artifactId>bootstrapfx-core</artifactId>
-            <version>0.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.hansolo</groupId>
-            <artifactId>tilesfx</artifactId>
-            <version>21.0.9</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.github.almasb</groupId>
-            <artifactId>fxgl</artifactId>
-            <version>17.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Spring Data JPA: Repository pattern, Hibernate ORM, Transaction management -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- MySQL Connector/J (single declaration) -->
+        <!-- Spring Boot Validation: Bean Validation (Jakarta Validation) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Cache: Caching abstraction with Caffeine -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- EPIC 3: API DOCUMENTATION (Swagger/OpenAPI)                     -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- Springdoc OpenAPI: Auto-generates Swagger UI and OpenAPI 3.0 docs -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- DATABASE DRIVERS                                                 -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- MySQL Connector -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>8.3.0</version>
-        </dependency>
-<!-- mongo db driver -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.10.2</version>
+            <scope>runtime</scope>
         </dependency>
 
-        <!-- Additional runtime / library dependencies -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.1.0</version>
-        </dependency>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- DATABASE MIGRATION                                               -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- Flyway: Database version control and migrations -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>10.10.0</version>
         </dependency>
+        
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
-            <version>10.10.0</version>
         </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- UTILITIES & LIBRARIES                                            -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- Lombok: Reduces boilerplate code (@Getter, @Setter, @Builder, etc.) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- BCrypt: Password hashing -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.13</version>
-        </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>2.0.13</version>
-    </dependency>
-    <!-- Add Caffeine dependency for caching -->
-    <dependency>
-        <groupId>com.github.ben-manes.caffeine</groupId>
-        <artifactId>caffeine</artifactId>
-        <version>3.1.8</version>
-    </dependency>
 
-</dependencies>
+        <!-- Caffeine: High-performance caching library -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- DEVELOPMENT TOOLS                                                -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- Spring Boot DevTools: Hot reload, LiveReload, etc. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- TESTING                                                          -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- Spring Boot Test: Testing framework with JUnit 5, Mockito, etc. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- REST Assured: API testing (optional but recommended) -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!--GraphQL: GraphQL dependency -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+
+    </dependencies>
 
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.fxml</include>
-                    <include>**/*.css</include>
-                </includes>
-            </resource>
-        </resources>
         <plugins>
+            <!-- Spring Boot Maven Plugin: Package as executable JAR -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <release>21</release>
-                    <compilerArgs>
-                        <arg>--add-reads</arg>
-                        <arg>SmartBloggingPlatform=ALL-UNNAMED</arg>
-                    </compilerArgs>
-                    <source>25</source>
-                    <target>25</target>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
+            <!-- Maven Compiler Plugin: Java 25 compilation -->
             <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <executions>
-                    <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
-                        <id>default-cli</id>
-                        <configuration>
-                            <mainClass>
-                                SmartBloggingPlatform/com.smartblog.bootstrap.DevSmokeTest
-                            </mainClass>
-                            <jvmArgs>
-                                --add-reads=SmartBloggingPlatform=ALL-UNNAMED
-                            </jvmArgs>
-                            <launcher>app</launcher>
-                            <jlinkZipName>app</jlinkZipName>
-                            <jlinkImageName>app</jlinkImageName>
-                            <noManPages>true</noManPages>
-                            <stripDebug>true</stripDebug>
-                            <noHeaderFiles>true</noHeaderFiles>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.34</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                    <!-- Exclude legacy JavaFX view files from compilation -->
+                    <excludes>
+                        <exclude>**/ui/view/**/*.java</exclude>
+                        <exclude>**/ui/navigation/**/*.java</exclude>
+                        <exclude>**/ui/components/**/*.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

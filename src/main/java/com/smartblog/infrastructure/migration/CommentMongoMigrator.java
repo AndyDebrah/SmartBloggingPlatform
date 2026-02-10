@@ -41,7 +41,7 @@ public class CommentMongoMigrator {
         migrateAll(ds, db);
 
         if (!enabled) {
-            System.out.println("Note: comments.nosql.enabled=false — you can enable it after migration.");
+            System.out.println("Note: comments.nosql.enabled=false â€” you can enable it after migration.");
         }
     }
 

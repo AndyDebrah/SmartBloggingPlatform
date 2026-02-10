@@ -1,129 +1,149 @@
-
 package com.smartblog.core.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
- * Represents an account in the system.
- * This is a pure domain object (POJO), meaning:
- * - It does NOT know about the database.
- * - It does NOT know about the UI.
- * - It only represents business data.
- *
- * Real-world reasons:
- * -------------------
- * In production systems, domain models are clean and isolated
- * so the business logic stays stable even if UI or database technologies change.
+ * JPA Entity representing a user account in the blogging platform.
  */
+@Entity
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "username")
+})
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString(exclude = {"posts"})
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "username", nullable = false, unique = true, length = 50)
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username can only contain letters, numbers, and underscores")
     private String username;
+
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @Size(max = 100, message = "Email must be at most 100 characters")
     private String email;
-    private String passwordHash;    // never store raw password
-    private String role;            // ADMIN, AUTHOR, READER
+
+    @Column(name = "password_hash", nullable = false, length = 255)
+    @NotBlank(message = "Password hash is required")
+    private String passwordHash;
+
+    @Column(name = "display_name", length = 100)
+    @Size(max = 100, message = "Display name must be at most 100 characters")
+    private String displayName;
+
+    @Column(name = "bio", length = 500)
+    @Size(max = 500, message = "Bio must be at most 500 characters")
+    private String bio;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    @Builder.Default
+    private UserRole role = UserRole.READER;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt; // soft delete
 
-    public User() {}
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
-    public User(Long id, String username, String email, String passwordHash,
-                String role, LocalDateTime createdAt,
-                LocalDateTime updatedAt, LocalDateTime deletedAt) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.role = role;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.deletedAt = deletedAt;
+    @OneToMany(mappedBy = "author", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Post> posts = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Comment> comments = new HashSet<>();
+
+    /**
+     * Checks if the user is soft-deleted.
+     */
+    public boolean isDeleted() {
+        return deletedAt != null;
     }
 
-    /** Convenience ctor used by DemoRunner when only basics are known. */
-    public User(Long id, String username, String email, String passwordHash, LocalDateTime createdAt) {
-        this(id, username, email, passwordHash, "READER", createdAt, createdAt, null);
+    /**
+     * Performs a soft delete on this user.
+     */
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
+    /**
+     * Restores a soft-deleted user.
+     */
+    public void restore() {
+        this.deletedAt = null;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    /**
+     * Checks if the user has admin privileges.
+     */
+    public boolean isAdmin() {
+        return role == UserRole.ADMIN;
     }
 
+    /**
+     * Checks if the user can author posts.
+     */
+    public boolean canAuthor() {
+        return role == UserRole.ADMIN || role == UserRole.AUTHOR;
+    }
+
+    /**
+     * Gets the user ID as an int for legacy JDBC compatibility.
+     */
     public int getUserId() {
         return id == null ? 0 : id.intValue();
     }
 
+    /**
+     * Sets the user ID from an int for legacy JDBC compatibility.
+     */
     public void setUserId(int userId) {
         this.id = (long) userId;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    // DAO and demo use getPassword/setPassword naming; map to passwordHash field.
+    /**
+     * Gets the password hash for legacy compatibility.
+     */
     public String getPassword() {
         return passwordHash;
     }
 
+    /**
+     * Sets the password hash for legacy compatibility.
+     */
     public void setPassword(String password) {
         this.passwordHash = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
     }
 }

@@ -1,0 +1,135 @@
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    role: String!
+    displayName: String
+    bio: String
+    createdAt: String!
+}
+
+type Post {
+    id: ID!
+    title: String!
+    content: String!
+    author: User!
+    published: Boolean!
+    tags: [Tag!]!
+    createdAt: String!
+    updatedAt: String
+}
+
+type Comment {
+    id: ID!
+    content: String!
+    post: Post!
+    user: User!
+    createdAt: String!
+}
+
+type Tag {
+    id: ID!
+    name: String!
+    slug: String!
+    description: String
+}
+
+type Review {
+    id: ID!
+    rating: Int!
+    comment: String
+    post: Post!
+    user: User!
+    createdAt: String!
+}
+
+#input types for mutations
+
+input CreateUserInput {
+    username: String!
+    email: String!
+    password: String!
+    role: String!
+    displayName: String
+    bio: String
+}
+
+input CreatePostInput {
+    title: String!
+    content: String!
+    authorId: ID!
+    published: Boolean
+}
+
+input UpdatePostInput {
+    title: String
+    content: String
+    published: Boolean
+}
+
+input CreateCommentInput {
+    content: String!
+    postId: ID!
+    userId: ID!
+}
+
+input CreateReviewInput {
+    rating: Int!
+    comment: String
+    postId: ID!
+    userId: ID!
+}
+
+# Queries
+
+type Query {
+    # User queries
+    allUsers: [User!]!
+    user(id: ID!): User
+    userByUsername(username: String!): User
+
+    # Post queries
+    allPosts: [Post!]!
+    post(id: ID!): Post
+    postsByAuthor(authorId: ID!): [Post!]!
+    publishedPosts: [Post!]!
+    recentPosts(days: Int!): [Post!]!
+    searchPosts(query: String!): [Post!]!
+
+    # Comment queries
+    commentsByPost(postId: ID!): [Comment!]!
+    commentsByUser(userId: ID!): [Comment!]!
+    recentComments(days: Int!): [Comment!]!
+
+    # Tag queries
+    allTags: [Tag!]!
+    tag(id: ID!): Tag
+    tagBySlug(slug: String!): Tag
+    popularTags(limit: Int!): [Tag!]!
+
+    # Review queries
+    reviewsByPost(postId: ID!): [Review!]!
+    reviewsByUser(userId: ID!): [Review!]!
+}
+
+#Mutation
+
+type Mutation {
+    # User mutations
+    createUser(input: CreateUserInput!): User!
+    deleteUser(id: ID!): Boolean!
+
+    # Post mutations
+    createPost(input: CreatePostInput!): Post!
+    updatePost(id: ID!, input: UpdatePostInput!): Post!
+    deletePost(id: ID!): Boolean!
+
+    # Comment mutations
+    createComment(input: CreateCommentInput!): Comment!
+    deleteComment(id: ID!): Boolean!
+
+    # Review mutations
+    createReview(input: CreateReviewInput!): Review!
+    deleteReview(id: ID!): Boolean!
+}

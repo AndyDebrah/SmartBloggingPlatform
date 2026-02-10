@@ -166,7 +166,7 @@ public class PostEditorController implements com.smartblog.ui.navigation.ParamRe
             for (String t : vm.assignedTags) {
                 javafx.scene.control.Label lbl = new javafx.scene.control.Label(t);
                 lbl.getStyleClass().addAll("tag-pill");
-                javafx.scene.control.Button remove = new javafx.scene.control.Button("✕");
+                javafx.scene.control.Button remove = new javafx.scene.control.Button("âœ•");
                 remove.getStyleClass().addAll("tag-remove");
                 remove.setOnAction(e -> safe(() -> vm.removeTagByName(t)));
                 javafx.scene.layout.HBox h = new javafx.scene.layout.HBox(6, lbl, remove);

@@ -58,7 +58,7 @@ public class AuthorDashboardController {
 
     @FXML
     public void initialize() {
-        heading.setText("Author Dashboard — your posts & reviews");
+        heading.setText("Author Dashboard â€” your posts & reviews");
         // Load author-specific stylesheet once the scene is ready
         heading.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -82,7 +82,7 @@ public class AuthorDashboardController {
                 if (empty || item == null) setText(null);
                 else {
                     int commentsCount = AppBootstrap.start().commentService.listForPost(item.id(), 0, 100).size();
-                    setText((item.published() ? "[P] " : "[D] ") + item.title() + " — " + commentsCount + " comments");
+                    setText((item.published() ? "[P] " : "[D] ") + item.title() + " â€” " + commentsCount + " comments");
                 }
             }
         });
@@ -98,10 +98,10 @@ public class AuthorDashboardController {
             
             // Icon-style action buttons below post
             private final HBox iconBar = new HBox(12);
-            private final Button editBtn = new Button("✏️ Edit");
-            private final Button publishBtn = new Button("📢 Publish");
-            private final Button commentIconBtn = new Button("💬 Comment");
-            private final Button viewCommentsBtn = new Button("👁 View Comments");
+            private final Button editBtn = new Button("âœï¸ Edit");
+            private final Button publishBtn = new Button("ðŸ“¢ Publish");
+            private final Button commentIconBtn = new Button("ðŸ’¬ Comment");
+            private final Button viewCommentsBtn = new Button("ðŸ‘ View Comments");
             private final Label commentCountLbl = new Label("0 comments");
             
             // Collapsible comment input area
@@ -275,17 +275,17 @@ public class AuthorDashboardController {
                             Label timeLbl = new Label(c.createdAt() != null ? c.createdAt().toString() : "");
                             timeLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b;");
                             
-                            Button reviewBtn = new Button("✓ Review");
+                            Button reviewBtn = new Button("âœ“ Review");
                             reviewBtn.getStyleClass().addAll("btn", "btn-icon");
                             reviewBtn.setStyle("-fx-font-size: 11px; -fx-padding: 6 10; -fx-text-fill: #a5b4fc; -fx-background-color: rgba(99,102,241,0.15); -fx-border-color: rgba(99,102,241,0.3); -fx-background-radius: 6; -fx-border-radius: 6;");
                             reviewBtn.setOnAction(ev -> {
                                 if (contentLbl.getStyle().contains("#64748b")) {
                                     contentLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #e2e8f0; -fx-padding: 4 0 8 0;");
-                                    reviewBtn.setText("✓ Review");
+                                    reviewBtn.setText("âœ“ Review");
                                     reviewBtn.setStyle("-fx-font-size: 11px; -fx-padding: 6 10; -fx-text-fill: #a5b4fc; -fx-background-color: rgba(99,102,241,0.15); -fx-border-color: rgba(99,102,241,0.3); -fx-background-radius: 6; -fx-border-radius: 6;");
                                 } else {
                                     contentLbl.setStyle("-fx-font-size: 14px; -fx-text-fill: #64748b; -fx-padding: 4 0 8 0;");
-                                    reviewBtn.setText("✓ Reviewed");
+                                    reviewBtn.setText("âœ“ Reviewed");
                                     reviewBtn.setStyle("-fx-font-size: 11px; -fx-padding: 6 10; -fx-text-fill: #86efac; -fx-background-color: rgba(34,197,94,0.15); -fx-border-color: rgba(34,197,94,0.3); -fx-background-radius: 6; -fx-border-radius: 6;");
                                 }
                             });
@@ -311,7 +311,7 @@ public class AuthorDashboardController {
                     setText(null); 
                 } else {
                     titleLbl.setText(item.title());
-                    metaLbl.setText((item.published() ? "📢 Published" : "📝 Draft") + " • by " + item.authorUsername());
+                    metaLbl.setText((item.published() ? "ðŸ“¢ Published" : "ðŸ“ Draft") + " â€¢ by " + item.authorUsername());
                     String content = item.content() == null ? "" : item.content();
                     String safe = content.replaceAll("(?i)<script.*?>.*?</script>", "");
                     
