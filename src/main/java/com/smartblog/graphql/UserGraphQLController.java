@@ -1,17 +1,19 @@
 package com.smartblog.graphql;
 
-import com.smartblog.core.model.User;
-import com.smartblog.core.model.UserRole;
-import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.smartblog.core.model.User;
+import com.smartblog.core.model.UserRole;
+import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Epic 4: GraphQL Controller for User operations
@@ -46,12 +48,28 @@ public class UserGraphQLController {
                 .username(input.username())
                 .email(input.email())
                 .passwordHash(input.password()) // Should hash in production
-                .role(UserRole.valueOf(input.role()))
+                .role(mapRole(input.role()))
                 .displayName(input.displayName())
                 .bio(input.bio())
                 .createdAt(LocalDateTime.now())
                 .build();
         return userRepository.save(user);
+    }
+
+    private UserRole mapRole(String role) {
+        if (role == null || role.isBlank()) {
+            return UserRole.READER;
+        }
+        String normalized = role.trim().toUpperCase();
+        // Legacy clients sometimes used "USER" — map to READER
+        if ("USER".equals(normalized)) {
+            normalized = "READER";
+        }
+        try {
+            return UserRole.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            return UserRole.READER;
+        }
     }
 
     @MutationMapping

@@ -23,7 +23,7 @@
         <java.version>21</java.version>
         <springdoc.version>2.3.0</springdoc.version>
         <mongodb.driver.version>4.11.1</mongodb.driver.version>
-
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     </properties>
 
     <dependencies>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>1.18.38</version>
             <scope>provided</scope>
         </dependency>
 
@@ -117,6 +117,19 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <!-- GraphQL: Spring for GraphQL starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+
+        <!-- MongoDB driver (needed by migration utilities) -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>${mongodb.driver.version}</version>
+        </dependency>
+
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <!-- DEVELOPMENT TOOLS                                                -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -128,6 +141,8 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+
+        
 
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -148,17 +163,24 @@
             <scope>test</scope>
         </dependency>
 
-
-        <!--GraphQL: GraphQL dependency -->
+        <!-- Spring Boot AOP: Aspect-Oriented Programming with AspectJ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-graphql</artifactId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
     </dependencies>
 
-
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <!-- Spring Boot Maven Plugin: Package as executable JAR -->
             <plugin>
@@ -174,10 +196,11 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Compiler Plugin: Java 25 compilation -->
+            <!-- Maven Compiler Plugin: Java 21 compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
                 <configuration>
                     <source>21</source>
                     <target>21</target>
@@ -185,17 +208,35 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.34</version>
+                            <version>1.18.38</version>
                         </path>
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <arg>-parameters</arg>
+                    </compilerArgs>
+                    <fork>true</fork>
+                    <meminitial>128m</meminitial>
+                    <maxmem>1024m</maxmem>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>
                     </compilerArgs>
                     <!-- Exclude legacy JavaFX view files from compilation -->
                     <excludes>
                         <exclude>**/ui/view/**/*.java</exclude>
                         <exclude>**/ui/navigation/**/*.java</exclude>
                         <exclude>**/ui/components/**/*.java</exclude>
+                        <exclude>**/infrastructure/migration/**/*.java</exclude>
+                        <exclude>**/infrastructure/nosql/**/*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
