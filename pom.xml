@@ -155,6 +155,20 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        
+            <!-- H2 Database for tests (in-memory) -->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <scope>test</scope>
+            </dependency>
+
+        <!-- GraphQL Test: Testing support for GraphQL with GraphQlTester -->
+        <dependency>
+            <groupId>org.springframework.graphql</groupId>
+            <artifactId>spring-graphql-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- REST Assured: API testing (optional but recommended) -->
         <dependency>
@@ -167,6 +181,34 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- JAVAFX (provided scope - for UI compilation only, not runtime)  -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        
+        <!-- JavaFX Controls: UI components (provided scope - compile only) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>21.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- JavaFX FXML: UI declarative markup (provided scope - compile only) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>21.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- JavaFX Web: WebView and HTMLEditor components (provided scope - compile only) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>21.0.1</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -235,6 +277,8 @@
                         <exclude>**/ui/view/**/*.java</exclude>
                         <exclude>**/ui/navigation/**/*.java</exclude>
                         <exclude>**/ui/components/**/*.java</exclude>
+                        <exclude>**/ui/**/*.java</exclude>
+                        <exclude>**/bootstrap/**/*.java</exclude>
                         <exclude>**/infrastructure/migration/**/*.java</exclude>
                         <exclude>**/infrastructure/nosql/**/*.java</exclude>
                     </excludes>

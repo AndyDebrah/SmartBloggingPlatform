@@ -9,16 +9,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 
+/**
+ * JPA entity representing a user review for a post.
+ *
+ * Enforces a unique constraint per (post,user) and validates rating values
+ * during persistence.
+ */
 @Entity
 @Table(name = "reviews",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"post_id", "user_id"})
-        },
-        indexes = {
-                @Index(name = "idx_post_id", columnList = "post_id"),
-                @Index(name = "idx_user_id", columnList = "user_id"),
-                @Index(name = "idx_rating", columnList = "rating")
-        }
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"post_id", "user_id"})
+    }
 )
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -85,20 +86,24 @@ public class Review {
     }
 
     /**
-     * GraphQL compatibility: expose reviewText as comment
+     * Expose review text as `comment` for GraphQL compatibility.
      */
     public String getComment() {
         return reviewText;
     }
 
     /**
-     * GraphQL compatibility: accept comment as reviewText
+     * Accept `comment` value and store it as `reviewText` for compatibility
+     * with GraphQL consumers.
      */
     public void setComment(String comment) {
         this.reviewText = comment;
     }
 
-
+    /**
+     * Validate rating before persisting/updating. Rating must be between 1-5.
+     * @throws IllegalArgumentException when rating is invalid
+     */
     @PrePersist
     @PreUpdate
     public void validateRating() {

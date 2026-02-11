@@ -14,12 +14,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 
+/**
+ * JPA entity representing a blog post.
+ *
+ * Contains convenience methods for soft-delete, publish/unpublish and legacy
+ * ID accessors used by DTO mappers.
+ */
 @Entity
-@Table(name = "posts", indexes = {
-        @Index(name = "idx_author_id", columnList = "author_id"),
-        @Index(name = "idx_created_at", columnList = "created_at"),
-        @Index(name = "idx_published", columnList = "published")
-})
+@Table(name = "posts")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
@@ -78,62 +80,101 @@ public class Post {
     @Builder.Default
     private Set<Comment> comments = new HashSet<>();
 
+    /**
+     * Returns true if the post has been soft-deleted.
+     */
     public boolean isDeleted() {
         return deletedAt != null;
     }
 
+    /**
+     * Mark the post as soft-deleted by setting the deletion timestamp.
+     */
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
     }
 
+    /**
+     * Restore a previously soft-deleted post.
+     */
     public void restore() {
         this.deletedAt = null;
     }
 
+    /**
+     * Mark the post as published.
+     */
     public void publish() {
         this.published = true;
     }
 
+    /**
+     * Mark the post as unpublished.
+     */
     public void unpublish() {
         this.published = false;
     }
 
 
+    /**
+     * Associate a tag with this post (bidirectional).
+     */
     public void addTag(Tag tag) {
         tags.add(tag);
         tag.getPosts().add(this);
     }
 
+    /**
+     * Remove an associated tag from this post (bidirectional).
+     */
     public void removeTag(Tag tag) {
         tags.remove(tag);
         tag.getPosts().remove(this);
     }
 
+    /**
+     * Legacy integer accessor for the post id (for JDBC compatibility).
+     */
     public int getPostId() {
         return id == null ? 0 : id.intValue();
     }
 
+    /**
+     * Legacy integer setter for the post id (for JDBC compatibility).
+     */
     public void setPostId(int postId) {
         this.id = (long) postId;
     }
 
+    /**
+     * Get the author id if the author is present.
+     */
     public Long getAuthorId() {
         return author != null ? author.getId() : null;
     }
 
+    /**
+     * Set the author id using a lightweight User placeholder. Prefer using
+     * {@code setAuthor(User)} when working with JPA entities.
+     */
     public void setAuthorId(Long authorId) {
-        // For DTO mapping compatibility; prefer setAuthor(User) for JPA
         if (author == null) {
             author = new User();
         }
         author.setId(authorId);
     }
 
+    /**
+     * Legacy integer accessor for the author id (for JDBC compatibility).
+     */
     public int getUserId() {
         Long authorId = getAuthorId();
         return authorId == null ? 0 : authorId.intValue();
     }
 
+    /**
+     * Legacy integer setter for the author id (for JDBC compatibility).
+     */
     public void setUserId(int userId) {
         setAuthorId((long) userId);
     }

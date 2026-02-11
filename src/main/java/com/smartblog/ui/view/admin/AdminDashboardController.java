@@ -10,6 +10,7 @@ import com.smartblog.core.dto.PostDTO;
 import com.smartblog.ui.components.UiExceptionHandler;
 import com.smartblog.ui.navigation.NavigationService;
 import com.smartblog.ui.navigation.View;
+import com.smartblog.ui.navigation.ViewParams;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,12 +22,21 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+/**
+ * Controller for the Admin Dashboard view.
+ * Handles admin navigation, searches and draft management.
+ */
 public class AdminDashboardController {
+    public AdminDashboardController() {
+        System.out.println("AdminDashboardController.<init>() called");
+    }
     @FXML private Label statsLabel;
     @FXML private Label draftCountLabel;
     @FXML private ListView<String> topTagsList;
@@ -37,7 +47,8 @@ public class AdminDashboardController {
     @FXML private Button viewAllPostsBtn;
     @FXML private Button viewCommentsBtn;
     @FXML private Button viewTagsBtn;
-
+@FXML private Button viewPerformanceBtn;
+    
     // Search controls
     @FXML private TextField searchKeywordField;
     @FXML private ComboBox<String> searchTagCombo;
@@ -51,20 +62,18 @@ public class AdminDashboardController {
 
     @FXML
     public void initialize() {
+        System.out.println("AdminDashboardController.initialize() called");
         topTagsList.setItems(topTags);
         draftsList.setItems(drafts);
         
-        // Back button
         if (backBtn != null) {
             backBtn.setOnAction(e -> NavigationService.navigate(View.MAIN));
         }
         
-        // Refresh button
         if (refreshBtn != null) {
             refreshBtn.setOnAction(e -> loadData());
         }
         
-        // Navigation buttons
         manageUsersBtn.setOnAction(e -> NavigationService.navigate(View.USERS));
         if (viewAllPostsBtn != null) {
             viewAllPostsBtn.setOnAction(e -> NavigationService.navigate(View.POSTS));
@@ -75,7 +84,23 @@ public class AdminDashboardController {
         if (viewTagsBtn != null) {
             viewTagsBtn.setOnAction(e -> NavigationService.navigate(View.TAG_MANAGER));
         }
-
+        if (viewPerformanceBtn != null) {
+            System.out.println("viewPerformanceBtn present: disabled=" + viewPerformanceBtn.isDisabled() + ", visible=" + viewPerformanceBtn.isVisible() + ", managed=" + viewPerformanceBtn.isManaged());
+            viewPerformanceBtn.setOnAction(e -> {
+                System.out.println("Performance button clicked (action handler)!");
+                NavigationService.navigate(View.PERFORMANCE);
+            });
+            // also add low-level mouse handler to detect events reaching the node
+            viewPerformanceBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> System.out.println("Performance button mouse clicked (event handler)"));
+            // add a mouse-pressed filter to surface raw targets and handler identity
+            viewPerformanceBtn.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+                System.out.println("Performance button mouse pressed (filter) target=" + e.getTarget() + " source=" + e.getSource());
+            });
+            // print the attached onAction handler object for verification
+            System.out.println("viewPerformanceBtn.getOnAction()=" + viewPerformanceBtn.getOnAction());
+        } else {
+            System.out.println("WARNING: viewPerformanceBtn is NULL");
+        }
         
         // Setup drafts list with custom cells
         draftsList.setCellFactory(lv -> new ListCell<PostDTO>() {
@@ -83,19 +108,19 @@ public class AdminDashboardController {
             private final Label titleLabel = new Label();
             private final Label metaLabel = new Label();
             private final HBox actionBar = new HBox(12);
-            private final Button publishBtn = new Button("ðŸ“¢ Publish");
-            private final Button editBtn = new Button("âœï¸ Edit");
-            private final Label statusLabel = new Label("ðŸ“ Draft");
+            private final Button publishBtn = new Button("📢 Publish");
+            private final Button editBtn = new Button("✏️ Edit");
+            private final Label statusLabel = new Label("📝 Draft");
             
             {
-                // Card styling
-                card.setStyle("-fx-background-color: #f8f9fc; -fx-padding: 16; -fx-background-radius: 8; -fx-border-color: #e8ecf4; -fx-border-radius: 8; -fx-border-width: 1;");
+                // Card styling - Dark theme
+                card.setStyle("-fx-background-color: linear-gradient(180deg, #242830 0%, #1e222a 100%); -fx-padding: 18; -fx-background-radius: 12; -fx-border-color: #374151; -fx-border-radius: 12; -fx-border-width: 1;");
                 
-                titleLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: 600; -fx-text-fill: #2d3748;");
-                metaLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #8b93a7;");
-                statusLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #f5576c; -fx-background-color: rgba(245,87,108,0.1); -fx-padding: 4 8; -fx-background-radius: 4;");
+                titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #ffffff;");
+                metaLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #94a3b8;");
+                statusLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #f97316; -fx-background-color: rgba(249,115,22,0.15); -fx-padding: 5 10; -fx-background-radius: 6; -fx-font-weight: 600;");
                 
-                publishBtn.setStyle("-fx-background-color: #f5576c; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 8 16; -fx-background-radius: 6;");
+                publishBtn.setStyle("-fx-background-color: linear-gradient(180deg, #ec4899 0%, #db2777 100%); -fx-text-fill: #ffffff; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 20; -fx-background-radius: 8;");
                 publishBtn.setOnAction(e -> {
                     PostDTO post = getItem();
                     if (post != null) {
@@ -103,11 +128,13 @@ public class AdminDashboardController {
                     }
                 });
                 
-                editBtn.setStyle("-fx-background-color: white; -fx-text-fill: #2d3748; -fx-font-size: 12px; -fx-padding: 8 16; -fx-background-radius: 6; -fx-border-color: #e8ecf4; -fx-border-radius: 6;");
+                editBtn.setStyle("-fx-background-color: rgba(255,255,255,0.08); -fx-text-fill: #e2e8f0; -fx-font-size: 13px; -fx-padding: 10 20; -fx-background-radius: 8; -fx-border-color: #4b5563; -fx-border-radius: 8;");
                 editBtn.setOnAction(e -> {
                     PostDTO post = getItem();
                     if (post != null) {
-                        NavigationService.navigate(View.POST_EDITOR, new com.smartblog.ui.navigation.ViewParams().put("postId", post.id()));
+                        ViewParams params = new ViewParams();
+                        params.put("postId", post.id());
+                        NavigationService.navigate(View.POST_EDITOR, params);
                     }
                 });
                 
@@ -125,7 +152,7 @@ public class AdminDashboardController {
                     setGraphic(null);
                 } else {
                     titleLabel.setText(item.title());
-                    metaLabel.setText("by " + item.authorUsername() + " â€¢ " + getCommentCount(item) + " comments");
+                    metaLabel.setText("by " + item.authorUsername() + " • " + getCommentCount(item) + " comments");
                     setGraphic(card);
                 }
             }
@@ -298,6 +325,17 @@ public class AdminDashboardController {
         drafts.setAll(draftPosts);
         if (draftCountLabel != null) {
             draftCountLabel.setText(draftPosts.size() + " draft" + (draftPosts.size() == 1 ? "" : "s"));
+        }
+    }
+
+    // FXML action handler bound from AdminDashboardView.fxml
+    public void handlePerformanceAction(ActionEvent event) {
+        System.out.println("Performance button handler (FXML) invoked");
+        try {
+            NavigationService.navigate(View.PERFORMANCE);
+        } catch (Exception e) {
+            System.out.println("Failed to navigate to PERFORMANCE: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

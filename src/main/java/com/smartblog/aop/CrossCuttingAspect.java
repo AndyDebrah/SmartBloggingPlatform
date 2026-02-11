@@ -15,6 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.smartblog.application.util.PerformanceBenchmark;
+/**
+ * Aspect providing cross-cutting concerns used in Lab 5.
+ *
+ * - Logs method entry/exit for service and repository layers
+ * - Measures execution time using {@link PerformanceBenchmark}
+ */
 @Component
 @Aspect
 public class CrossCuttingAspect {
@@ -31,6 +37,7 @@ public class CrossCuttingAspect {
     public void serviceLayer() {}
 
     @Before("serviceLayer()")
+    /** Log method entry with arguments. */
     public void logMethodEntry(JoinPoint joinPoint) {
         String className = joinPoint.getSignature().getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
@@ -39,6 +46,7 @@ public class CrossCuttingAspect {
     }
 
     @AfterReturning(pointcut = "serviceLayer()", returning = "result")
+    /** Log method exit and a short result summary. */
     public void logMethodExit(JoinPoint joinPoint, Object result) {
         String className = joinPoint.getSignature().getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
@@ -47,6 +55,10 @@ public class CrossCuttingAspect {
     }
 
     @Around("serviceLayer()")
+    /**
+     * Measure execution time of the intercepted method and record it in the
+     * {@link PerformanceBenchmark} instance.
+     */
     public Object measureExecutionTime(ProceedingJoinPoint pjp) throws Throwable {
         String className = pjp.getSignature().getDeclaringTypeName();
         String methodName = pjp.getSignature().getName();
@@ -54,24 +66,19 @@ public class CrossCuttingAspect {
 
         LOG.debug("[AOP @Around] Starting performance measurement for {}", fullMethodName);
 
-        // Use PerformanceBenchmark to measure and record execution time
-        // The benchmark.record() method handles timing internally
         try {
             Object result = benchmark.record(fullMethodName, () -> {
                 try {
                     return pjp.proceed();
                 } catch (Throwable t) {
-                    // Wrap checked exceptions so they can be thrown from Supplier
                     throw new RuntimeException(t);
                 }
             });
 
             return result;
         } catch (RuntimeException ex) {
-            // Unwrap the original exception to preserve stack trace and type
             Throwable cause = ex.getCause();
             if (cause != null) {
-                // Re-throw the original exception
                 if (cause instanceof Error) {
                     throw (Error) cause;
                 }
@@ -82,6 +89,7 @@ public class CrossCuttingAspect {
     }
 
     @AfterThrowing(pointcut = "serviceLayer()", throwing = "ex")
+    /** Log exceptions thrown by service/repository methods. */
     public void logException(JoinPoint joinPoint, Throwable ex) {
         String className = joinPoint.getSignature().getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
@@ -90,6 +98,9 @@ public class CrossCuttingAspect {
                 className, methodName, ex.getClass().getSimpleName(), ex.getMessage());
     }
 
+    /**
+     * Format a concise representation of a result value for logging.
+     */
     private String formatResult(Object result) {
         if (result == null) {
             return "null";
@@ -110,13 +121,18 @@ public class CrossCuttingAspect {
         return str;
     }
 
+    /** Return the current benchmark report. */
     public PerformanceBenchmark.BenchmarkReport getBenchmarkReport() {
         return benchmark.generateReport();
     }
+
+    /** Reset all recorded benchmarks. */
     public void resetBenchmarks() {
         LOG.info("[AOP] Resetting performance benchmarks");
         benchmark.reset();
     }
+
+    /** Return the number of recorded benchmark entries. */
     public int getBenchmarkCount() {
         return benchmark.size();
     }

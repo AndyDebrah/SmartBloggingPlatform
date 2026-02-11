@@ -1,105 +1,335 @@
 # 📝 SmartBloggingPlatform
 
-A modern, feature-rich desktop blogging platform built with **Java 21**, **JavaFX**, and a **polyglot persistence** architecture using both **MySQL** and **MongoDB**.
+A modern, enterprise-grade blogging platform built with **Java 21**, **Spring Boot 3.2.2**, and **MySQL 8.0**. Originally a JavaFX desktop application, now transformed into a RESTful web service with GraphQL support (Lab 5).
 
 ![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
-![JavaFX](https://img.shields.io/badge/JavaFX-21.0.6-blue?style=flat-square)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.2-brightgreen?style=flat-square&logo=springboot)
 ![MySQL](https://img.shields.io/badge/MySQL-8.x-blue?style=flat-square&logo=mysql)
-![MongoDB](https://img.shields.io/badge/MongoDB-4.10-green?style=flat-square&logo=mongodb)
 ![Maven](https://img.shields.io/badge/Maven-3.8+-red?style=flat-square&logo=apachemaven)
+![Swagger](https://img.shields.io/badge/Swagger-OpenAPI%203.0-green?style=flat-square&logo=swagger)
+![GraphQL](https://img.shields.io/badge/GraphQL-16.2.0-E10098?style=flat-square&logo=graphql)
 
 ---
 
 ## 📋 Table of Contents
 
+- [Lab 5 Achievements](#-lab-5-achievements)
 - [Features](#-features)
 - [Architecture](#-architecture)
 - [Technology Stack](#-technology-stack)
+- [API Documentation](#-api-documentation)
 - [Database Schema](#-database-schema)
 - [Getting Started](#-getting-started)
 - [Configuration](#-configuration)
 - [Project Structure](#-project-structure)
-- [UI Screenshots](#-ui-screenshots)
-- [Performance Benchmarking](#-performance-benchmarking)
+- [Testing](#-testing)
 - [Contributing](#-contributing)
+
+---
+
+## 🎓 Lab 5 Achievements
+
+### Epic 3: REST API Development ✅ COMPLETE
+
+#### What We Built
+Transformed the JavaFX desktop application into a modern RESTful web service with the following features:
+
+**1. REST Controllers Implemented:**
+- ✅ **PostController** - Full CRUD for blog posts with pagination and search
+- ✅ **CommentController** - Comment management with post/user filtering
+- ✅ **UserController** - User operations with role-based access
+- ✅ **TagController** - Tag management with popularity tracking
+- ✅ **ReviewController** - Post reviews and rating statistics
+
+**2. Key Technical Achievements:**
+- ✅ **Swagger UI Integration** - Interactive API documentation at `/swagger-ui.html`
+- ✅ **Transaction Management** - All endpoints properly annotated with `@Transactional`
+- ✅ **Lazy Loading Fix** - Resolved all `LazyInitializationException` errors across controllers
+- ✅ **DTO Pattern** - Clean separation using `PostDTO`, `CommentDTO`, `UserDTO`, etc.
+- ✅ **Pagination Support** - Implemented `Pageable` for all list endpoints
+- ✅ **MongoDB Removal** - Simplified architecture by removing dual-write complexity
+- ✅ **Legacy Code Cleanup** - Deleted all JavaFX UI code, JDBC repositories, and mappers
+
+**3. Successfully Tested Operations:**
+| Operation | Endpoint | Status | Notes |
+|-----------|----------|--------|-------|
+| Create User | `POST /api/users` | ✅ | User "Prince" created (id=7) |
+| Create Post | `POST /api/posts` | ✅ | Post "Introduction to Programming" (id=74) |
+| Update Post | `PUT /api/posts/74` | ✅ | Updated title and published status |
+| Get All Posts | `GET /api/posts` | ✅ | Returns 22 published posts with pagination |
+| Search Posts | `GET /api/posts/search` | ✅ | Full-text search working |
+
+**4. Architecture Improvements:**
+```
+Before (Lab 1-4):                After (Lab 5):
+JavaFX Desktop App               RESTful Web Service
+├── UI Layer (FXML)              ├── REST Controllers
+├── Service Layer                ├── Service Layer (unchanged)
+├── JDBC Repositories            ├── JPA Repositories
+├── MongoDB (dual-write)         ├── MySQL only
+└── MySQL                        └── Swagger Documentation
+```
+
+**5. Configuration Highlights:**
+- **HikariCP Connection Pool**: max-pool-size=15, optimized for concurrent requests
+- **Flyway Migrations**: 3 versions applied (init, indexes, full-text search)
+- **Spring Data JPA**: Hibernate 6.4.1.Final with MySQL8Dialect
+- **Profile-Based Config**: `application-local.properties` for development
+- **Transaction Isolation**: `READ_COMMITTED` for consistent reads
+
+### Epic 4: GraphQL Integration 🔄 IN PROGRESS
+
+**Status:** Blocked by `pom.xml` syntax errors
+
+**Planned Implementation:**
+1. ⏳ Add `spring-boot-starter-graphql` dependency (currently blocked)
+2. 🔜 Create GraphQL schema file (`schema.graphqls`)
+3. 🔜 Implement GraphQL controllers with `@QueryMapping` and `@MutationMapping`
+4. 🔜 Enable GraphiQL interface at `/graphiql`
+5. 🔜 Test queries and mutations for User, Post, Comment, Tag, Review
+
+**Expected Benefits:**
+- Flexible data fetching (clients request only needed fields)
+- Reduced over-fetching compared to REST
+- Single endpoint for all operations
+- Strong typing with GraphQL schema
 
 ---
 
 ## ✨ Features
 
-### Core Functionality
-- 📝 **Blog Post Management** - Create, edit, publish, and delete blog posts with rich text content
-- 👥 **User Management** - Multi-role system (Admin, Author) with secure authentication
-- 💬 **Comments System** - Full commenting with dual-write to MySQL and MongoDB
+### Core REST API Functionality (Lab 5)
+- 📝 **Blog Post Management** - Create, update, delete, publish posts via REST endpoints
+- 👥 **User Management** - RESTful user CRUD with role support (Admin, Author)
+- 💬 **Comments System** - Full comment management with JPA persistence
 - 🏷️ **Tag Management** - Organize posts with tags and slug-based URLs
-- 🔍 **Full-Text Search** - MySQL full-text indexing for fast content search
-- 📊 **Analytics Dashboard** - View post statistics and engagement metrics
+- ⭐ **Review System** - Post reviews with rating statistics
+- 🔍 **Full-Text Search** - MySQL full-text indexing on posts (title + content)
+- 📊 **Pagination Support** - All list endpoints support page/size parameters
+- 📖 **Swagger UI** - Interactive API documentation and testing at `/swagger-ui.html`
 
 ### Technical Features
-- 🗄️ **Polyglot Persistence** - MySQL for relational data, MongoDB for flexible comment storage
-- ⚡ **High-Performance Caching** - Caffeine cache for optimized query performance
+- 🗄️ **Spring Data JPA** - Repository pattern with Hibernate ORM
+- ⚡ **Transaction Management** - Proper `@Transactional` annotations preventing lazy-loading errors
 - 🔄 **Database Migrations** - Flyway for version-controlled schema management
-- 🔐 **Secure Authentication** - BCrypt password hashing
-- 🎨 **Modern Dark Theme** - Sleek, high-contrast UI with gradient accents
-- 📈 **Performance Benchmarking** - Built-in benchmark tool for query performance analysis
+- 🔐 **Secure Authentication** - BCrypt password hashing (legacy from JavaFX era)
+- 📈 **HikariCP Connection Pool** - Optimized database connection management
+- 🎯 **DTO Pattern** - Clean data transfer with validation annotations
+- 🚀 **GraphQL Support** - Coming in Epic 4 (in progress)
+
+### Deprecated Features (Removed in Lab 5)
+- ❌ **JavaFX Desktop UI** - Migrated to REST API
+- ❌ **MongoDB Dual-Write** - Simplified to MySQL-only persistence
+- ❌ **JDBC Repositories** - Replaced with Spring Data JPA
+- ❌ **Caffeine Caching** - Removed during architecture simplification
 
 ---
 
 ## 🏗️ Architecture
 
-The application follows a **layered architecture** with clear separation of concerns:
+The application follows a **Spring Boot layered architecture** with REST API endpoints:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        UI Layer                             │
-│   (JavaFX Views, FXML Controllers, CSS Themes)              │
+│                      REST API Layer                         │
+│   (Controllers, Swagger UI, GraphQL - coming soon)          │
 ├─────────────────────────────────────────────────────────────┤
 │                   Application Layer                         │
-│   (Services, DTOs, Security Context, Utilities)             │
+│   (Services, DTOs, Security, Utilities)                     │
 ├─────────────────────────────────────────────────────────────┤
 │                   Infrastructure Layer                      │
-│   (Repositories, DAOs, Caching, Data Sources)               │
+│   (JPA Repositories, Transaction Management, Flyway)        │
 ├─────────────────────────────────────────────────────────────┤
 │                     Data Layer                              │
-│   ┌─────────────────┐       ┌─────────────────┐            │
-│   │     MySQL       │       │    MongoDB      │            │
-│   │  (Relational)   │       │   (Document)    │            │
-│   └─────────────────┘       └─────────────────┘            │
+│                  ┌─────────────────┐                        │
+│                  │     MySQL       │                        │
+│                  │ (Smart_Blog DB) │                        │
+│                  └─────────────────┘                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Design Patterns
-- **Repository Pattern** - Abstraction over data access
+- **Repository Pattern** - Spring Data JPA repositories
 - **Service Layer Pattern** - Business logic encapsulation
-- **DTO Pattern** - Data transfer between layers using Java Records
-- **Factory Pattern** - Database connection and client creation
-- **Dual-Write Pattern** - Synchronized writes to MySQL and MongoDB
+- **DTO Pattern** - Data transfer with Java Records and validation
+- **Controller Pattern** - REST endpoints with `@RestController`
+- **Transaction Management** - Declarative `@Transactional` annotations
+
+### Migration Journey (Lab 5)
+```
+JavaFX Desktop (Labs 1-4)  →  Spring Boot REST API (Lab 5)
+├── FXML Controllers       →  REST Controllers
+├── JDBC Repositories      →  JPA Repositories  
+├── MongoDB (dual-write)   →  MySQL only
+├── Desktop UI             →  Swagger UI + GraphQL (coming)
+└── Synchronous calls      →  HTTP REST/GraphQL APIs
+```
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Category | Technology | Version |
-|----------|------------|---------|
-| **Language** | Java | 21 |
-| **UI Framework** | JavaFX | 21.0.6 |
-| **Build Tool** | Maven | 3.8+ |
-| **Primary Database** | MySQL | 8.x |
-| **Secondary Database** | MongoDB | 4.x+ |
-| **Connection Pool** | HikariCP | 5.1.0 |
-| **DB Migrations** | Flyway | 10.10.0 |
-| **Caching** | Caffeine | 3.1.8 |
-| **Password Hashing** | jBCrypt | 0.4 |
-| **Logging** | SLF4J | 2.0.13 |
-| **Testing** | JUnit Jupiter | 5.12.1 |
+| Category | Technology | Version | Purpose |
+|----------|------------|---------|---------|
+| **Language** | Java (OpenJDK) | 21.0.9 | Core programming language |
+| **Framework** | Spring Boot | 3.2.2 | Application framework |
+| **Web** | Spring Web | 6.1.3 | REST API support |
+| **GraphQL** | Spring GraphQL | 16.2.0 | GraphQL API (Epic 4) |
+| **ORM** | Hibernate | 6.4.1.Final | JPA implementation |
+| **Data Access** | Spring Data JPA | 3.2.2 | Repository abstraction |
+| **Validation** | Jakarta Validation | 3.0 | DTO validation |
+| **Build Tool** | Maven | 3.8+ | Dependency management |
+| **Database** | MySQL | 8.0 | Primary relational database |
+| **Connection Pool** | HikariCP | 5.1.0 | Database connection pooling |
+| **DB Migrations** | Flyway | 9.22.3 | Schema version control |
+| **API Docs** | Springdoc OpenAPI | 2.3.0 | Swagger UI generation |
+| **Security** | jBCrypt | 0.4 | Password hashing |
+| **Lombok** | Lombok | 1.18.34 | Boilerplate reduction |
+| **Testing** | JUnit Jupiter | 5.11.4 | Unit testing |
 
-### Additional UI Libraries
-- **ControlsFX** - Enhanced JavaFX controls
-- **FormsFX** - Form handling
-- **ValidatorFX** - Input validation
-- **Ikonli** - Icon fonts
-- **BootstrapFX** - Bootstrap-inspired styling
-- **TilesFX** - Dashboard tiles
+### Removed Dependencies (Lab 5 Cleanup)
+- ~~JavaFX~~ - UI layer removed
+- ~~MongoDB~~ - Simplified to MySQL-only
+- ~~Caffeine Cache~~ - Removed during architecture simplification
+- ~~ControlsFX, FormsFX, ValidatorFX~~ - Desktop UI libraries
+
+---
+
+## 📖 API Documentation
+
+### Swagger UI
+Access interactive API documentation at: **http://localhost:8080/swagger-ui.html**
+
+### Available REST Endpoints
+
+#### User Management (`/api/users`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/users` | Get all users (paginated) |
+| `GET` | `/api/users/{id}` | Get user by ID |
+| `GET` | `/api/users/username/{username}` | Get user by username |
+| `GET` | `/api/users/search` | Search users by query |
+| `POST` | `/api/users` | Create new user |
+| `PUT` | `/api/users/{id}` | Update user |
+| `DELETE` | `/api/users/{id}` | Delete user |
+
+#### Post Management (`/api/posts`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/posts` | Get all posts (paginated) |
+| `GET` | `/api/posts/{id}` | Get post by ID |
+| `GET` | `/api/posts/search` | Full-text search posts |
+| `GET` | `/api/posts/author/{authorId}` | Get posts by author |
+| `GET` | `/api/posts/tag/{tagId}` | Get posts by tag |
+| `POST` | `/api/posts` | Create new post |
+| `PUT` | `/api/posts/{id}` | Update post |
+| `DELETE` | `/api/posts/{id}` | Delete post |
+
+#### Comment Management (`/api/comments`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/comments/post/{postId}` | Get comments by post |
+| `GET` | `/api/comments/user/{userId}` | Get comments by user |
+| `GET` | `/api/comments/{id}` | Get comment by ID |
+| `GET` | `/api/comments/recent` | Get recent comments |
+| `POST` | `/api/comments` | Create new comment |
+| `PUT` | `/api/comments/{id}` | Update comment |
+| `DELETE` | `/api/comments/{id}` | Delete comment |
+
+#### Tag Management (`/api/tags`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/tags` | Get all tags |
+| `GET` | `/api/tags/{id}` | Get tag by ID |
+| `GET` | `/api/tags/slug/{slug}` | Get tag by slug |
+| `GET` | `/api/tags/search` | Search tags |
+| `GET` | `/api/tags/popular` | Get popular tags |
+| `POST` | `/api/tags` | Create new tag |
+
+#### Review Management (`/api/reviews`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/reviews/post/{postId}` | Get reviews by post |
+| `GET` | `/api/reviews/user/{userId}` | Get reviews by user |
+| `GET` | `/api/reviews/{id}` | Get review by ID |
+| `GET` | `/api/reviews/post/{postId}/stats` | Get post rating statistics |
+| `POST` | `/api/reviews` | Create new review |
+| `PUT` | `/api/reviews/{id}` | Update review |
+
+### Example API Calls
+
+**Create User:**
+```bash
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "Prince",
+    "email": "Prince@gmail.com",
+    "password": "password123",
+    "role": "AUTHOR"
+  }'
+```
+
+**Response:**
+```json
+{
+  "status": "SUCCESS",
+  "statusCode": 201,
+  "data": {
+    "id": 7,
+    "username": "Prince",
+    "email": "Prince@gmail.com",
+    "role": "AUTHOR"
+  }
+}
+```
+
+**Create Post:**
+```bash
+curl -X POST http://localhost:8080/api/posts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Introduction to Programming",
+    "content": "Programming is the language computer understands",
+    "authorId": 7,
+    "published": false,
+    "tagIds": []
+  }'
+```
+
+**Get All Posts (Paginated):**
+```bash
+curl "http://localhost:8080/api/posts?page=0&size=10"
+```
+
+**Response:**
+```json
+{
+  "status": "SUCCESS",
+  "statusCode": 200,
+  "data": {
+    "content": [
+      {
+        "id": 74,
+        "title": "Introduction to Programming - Updated",
+        "content": "Programming is the language computer understands",
+        "authorUsername": "Prince",
+        "published": true,
+        "tags": []
+      }
+    ],
+    "pageable": {...},
+    "totalElements": 22,
+    "totalPages": 3,
+    "number": 0,
+    "size": 10
+  }
+}
+```
+
+### GraphQL API (Coming in Epic 4)
+GraphQL endpoint will be available at: **http://localhost:8080/graphql**  
+GraphiQL interface: **http://localhost:8080/graphiql**
 
 ---
 
@@ -192,22 +422,15 @@ The application follows a **layered architecture** with clear separation of conc
 | `created_at` | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
 | `deleted_at` | DATETIME | NULL (Soft delete) |
 
-### MongoDB Collections
-
-#### `comments` Collection
-Comments are dual-written to MongoDB for flexible querying and future scalability.
-
-```json
-{
-  "_id": ObjectId("..."),
-  "mysqlId": 123,
-  "postId": 45,
-  "userId": 7,
-  "username": "john_doe",
-  "content": "Great post!",
-  "createdAt": ISODate("2026-01-28T10:30:00Z")
-}
-```
+#### `reviews` (Lab 5 Addition)
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
+| `post_id` | BIGINT | NOT NULL, FK → posts(id) ON DELETE CASCADE |
+| `user_id` | BIGINT | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `rating` | INT | NOT NULL, CHECK (1-5) |
+| `comment` | TEXT | NULL |
+| `created_at` | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
 
 ### Database Relationships
 
@@ -216,7 +439,14 @@ Comments are dual-written to MongoDB for flexible querying and future scalabilit
 | User → Posts | One-to-Many | A user can author multiple posts |
 | Post → Comments | One-to-Many | A post can have multiple comments |
 | User → Comments | One-to-Many | A user can write multiple comments |
+| Post → Reviews | One-to-Many | A post can have multiple reviews (Lab 5) |
+| User → Reviews | One-to-Many | A user can write multiple reviews (Lab 5) |
 | Post ↔ Tags | Many-to-Many | Posts and tags are linked via `post_tags` |
+
+### Flyway Migrations (Lab 5)
+- **V1__init.sql** - Initial schema creation
+- **V2__performance_indexes.sql** - Added performance indexes
+- **V3__fulltext_search_index.sql** - Full-text search on posts (title, content)
 
 ---
 
@@ -224,10 +454,9 @@ Comments are dual-written to MongoDB for flexible querying and future scalabilit
 
 ### Prerequisites
 
-- **Java 21** or higher
+- **Java 21** (OpenJDK 21.0.9 recommended)
 - **Maven 3.8+**
 - **MySQL 8.x** running on `localhost:3306`
-- **MongoDB 4.x+** running on `localhost:27017`
 
 ### Installation
 
@@ -242,63 +471,108 @@ Comments are dual-written to MongoDB for flexible querying and future scalabilit
    CREATE DATABASE smart_blog;
    ```
 
-3. **Configure database credentials** (see [Configuration](#-configuration))
+3. **Configure database credentials**
+   Edit `src/main/resources/application-local.properties`:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/smart_blog
+   spring.datasource.username=root
+   spring.datasource.password=your_password
+   ```
 
 4. **Build the project**
    ```bash
-   ./mvnw clean compile
+   ./mvnw clean install
    ```
 
 5. **Run the application**
    ```bash
-   ./mvnw javafx:run
+   ./mvnw spring-boot:run
    ```
 
-   Or run directly:
+   Or using Maven wrapper:
    ```bash
-   java --module-path target/classes -m SmartBloggingPlatform/com.smartblog.App
+   mvnw.cmd spring-boot:run  # Windows
+   ./mvnw spring-boot:run     # Linux/Mac
    ```
+
+6. **Access the API**
+   - Swagger UI: http://localhost:8080/swagger-ui.html
+   - REST API Base: http://localhost:8080/api
+   - GraphiQL (Epic 4): http://localhost:8080/graphiql (coming soon)
+
+### Quick Test via Swagger
+
+1. Navigate to http://localhost:8080/swagger-ui.html
+2. Try the **POST /api/users** endpoint:
+   ```json
+   {
+     "username": "testuser",
+     "email": "test@example.com",
+     "password": "password123",
+     "role": "AUTHOR"
+   }
+   ```
+3. Test **GET /api/posts** to see existing blog posts
+4. Explore other endpoints using the interactive documentation
 
 ---
 
 ## ⚙️ Configuration
 
-Configuration is managed via `src/main/resources/application.properties`:
+Configuration is managed via profile-based properties files:
 
+### `application.properties` (Global)
 ```properties
-# Environment
-app.env=DEV
+# Application Settings
+spring.application.name=SmartBloggingPlatform
+server.port=8080
 
+# Active Profile
+spring.profiles.active=local
+
+# JPA Configuration
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+### `application-local.properties` (Development)
+```properties
 # MySQL Configuration
-db.url=jdbc:mysql://localhost:3306/smart_blog?useSSL=false&serverTimezone=UTC
-db.user=root
-db.password=your_password
+spring.datasource.url=jdbc:mysql://localhost:3306/smart_blog?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # HikariCP Connection Pool
-db.pool.max=15
-db.pool.min=2
-db.pool.idleTimeoutMs=600000
-db.pool.maxLifetimeMs=1800000
+spring.datasource.hikari.maximum-pool-size=15
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.idle-timeout=600000
+spring.datasource.hikari.max-lifetime=1800000
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.jdbc.batch_size=20
 
 # Flyway Migrations
-flyway.locations=filesystem:src/main/resources/db/migration
-flyway.enabled=true
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
+spring.flyway.validate-on-migrate=false
 
-# MongoDB Configuration
-comments.nosql.enabled=true
-mongodb.uri=mongodb://localhost:27017
-mongodb.database=smart_blog_nosql
+# Swagger/OpenAPI
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
 ```
 
 ### Configuration Options
 
 | Property | Description | Default |
 |----------|-------------|---------|
-| `app.env` | Environment (DEV/PROD) | DEV |
-| `db.url` | MySQL JDBC connection URL | - |
-| `db.pool.max` | Maximum pool connections | 15 |
-| `comments.nosql.enabled` | Enable MongoDB dual-write | true |
-| `flyway.enabled` | Run migrations on startup | true |
+| `server.port` | HTTP server port | 8080 |
+| `spring.datasource.hikari.maximum-pool-size` | Max DB connections | 15 |
+| `spring.jpa.show-sql` | Log SQL queries | true (dev) |
+| `spring.flyway.enabled` | Run migrations on startup | true |
+| `spring.flyway.validate-on-migrate` | Validate migration checksums | false (dev) |
 
 ---
 
@@ -309,66 +583,168 @@ SmartBloggingPlatform/
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   ├── module-info.java
+│   │   │   ├── module-info.java (deprecated - to be removed)
 │   │   │   └── com/smartblog/
-│   │   │       ├── App.java                 # Application entry point
+│   │   │       ├── SmartBlogApplication.java   # Spring Boot entry point
 │   │   │       ├── application/
-│   │   │       │   ├── security/            # Security context
-│   │   │       │   ├── service/             # Business logic services
-│   │   │       │   └── util/                # Utilities (Slugs, Perf)
-│   │   │       ├── bootstrap/
-│   │   │       │   ├── AppBootstrap.java    # Dependency wiring
-│   │   │       │   └── DevSmokeTest.java    # Development entry
+│   │   │       │   ├── security/               # Security context (legacy)
+│   │   │       │   ├── service/                # Business logic services
+│   │   │       │   │   ├── UserService.java
+│   │   │       │   │   ├── PostService.java
+│   │   │       │   │   ├── CommentService.java
+│   │   │       │   │   ├── TagService.java
+│   │   │       │   │   └── ReviewService.java
+│   │   │       │   └── util/                   # Utilities
 │   │   │       ├── core/
-│   │   │       │   ├── config/              # Connection managers
-│   │   │       │   ├── dao/                 # Data Access Objects
-│   │   │       │   ├── dto/                 # Data Transfer Objects
-│   │   │       │   ├── exceptions/          # Custom exceptions
-│   │   │       │   ├── mapper/              # Entity ↔ DTO mappers
-│   │   │       │   └── model/               # Domain models
+│   │   │       │   ├── dto/                    # Data Transfer Objects
+│   │   │       │   │   ├── UserDTO.java
+│   │   │       │   │   ├── PostDTO.java
+│   │   │       │   │   ├── CommentDTO.java
+│   │   │       │   │   ├── TagDTO.java
+│   │   │       │   │   └── ReviewDTO.java
+│   │   │       │   ├── exceptions/             # Custom exceptions
+│   │   │       │   └── model/                  # JPA Entities
+│   │   │       │       ├── User.java
+│   │   │       │       ├── Post.java
+│   │   │       │       ├── Comment.java
+│   │   │       │       ├── Tag.java
+│   │   │       │       └── Review.java
 │   │   │       ├── infrastructure/
-│   │   │       │   ├── caching/             # Caffeine cache manager
-│   │   │       │   ├── datasource/          # Data source config
-│   │   │       │   ├── migration/           # Flyway + MongoDB migrator
-│   │   │       │   ├── nosql/               # MongoDB client factory
-│   │   │       │   └── repository/          # Repository implementations
+│   │   │       │   ├── datasource/             # Data source config
+│   │   │       │   ├── migration/              # Flyway migrations
+│   │   │       │   └── repository/             # Spring Data JPA
+│   │   │       │       ├── jpa/
+│   │   │       │       │   ├── UserJpaRepository.java
+│   │   │       │       │   ├── PostJpaRepository.java
+│   │   │       │       │   ├── CommentJpaRepository.java
+│   │   │       │       │   ├── TagJpaRepository.java
+│   │   │       │       │   └── ReviewJpaRepository.java
 │   │   │       └── ui/
-│   │   │           ├── components/          # Reusable UI components
-│   │   │           ├── navigation/          # Navigation service
-│   │   │           ├── themes/              # CSS themes
-│   │   │           │   ├── styles-dark.css
-│   │   │           │   ├── styles-light.css
-│   │   │           │   └── variables.css
-│   │   │           └── view/                # FXML views + controllers
-│   │   │               ├── admin/           # Admin dashboard
-│   │   │               ├── analytics/       # Analytics views
-│   │   │               ├── authors/         # Author dashboard
-│   │   │               ├── comments/        # Comment management
-│   │   │               ├── login/           # Login screen
-│   │   │               ├── main/            # Main layout
-│   │   │               ├── performance/     # Benchmark reports
-│   │   │               ├── posts/           # Post management
-│   │   │               ├── search/          # Search functionality
-│   │   │               ├── tags/            # Tag management
-│   │   │               └── users/           # User management
+│   │   │           └── controller/             # REST Controllers
+│   │   │               ├── UserController.java
+│   │   │               ├── PostController.java
+│   │   │               ├── CommentController.java
+│   │   │               ├── TagController.java
+│   │   │               └── ReviewController.java
 │   │   └── resources/
 │   │       ├── application.properties
-│   │       ├── db.properties
+│   │       ├── application-local.properties
 │   │       └── db/migration/
-│   │           └── V1__init.sql             # Initial schema
+│   │           ├── V1__init.sql
+│   │           ├── V2__performance_indexes.sql
+│   │           └── V3__fulltext_search_index.sql
 │   └── test/
-│       └── java/                            # Unit tests
-├── pom.xml
-├── mvnw / mvnw.cmd                          # Maven wrapper
+│       └── java/                               # Unit tests
+├── target/                                     # Compiled output
+├── pom.xml                                     # Maven dependencies
+├── mvnw / mvnw.cmd                             # Maven wrapper
 └── README.md
+```
+
+### Key Directories (Lab 5)
+
+| Directory | Purpose |
+|-----------|---------|
+| `ui/controller/` | REST API endpoints (`@RestController`) |
+| `application/service/` | Business logic layer |
+| `infrastructure/repository/jpa/` | Spring Data JPA repositories |
+| `core/model/` | JPA entities (`@Entity`) |
+| `core/dto/` | Data Transfer Objects (Java Records) |
+| `resources/db/migration/` | Flyway SQL migration scripts |
+
+### Removed Directories (Lab 5 Cleanup)
+- ❌ `ui/view/` - JavaFX FXML views
+- ❌ `ui/components/` - JavaFX UI components
+- ❌ `ui/themes/` - CSS theme files
+- ❌ `infrastructure/repository/jdbc/` - Legacy JDBC repositories
+- ❌ `infrastructure/nosql/` - MongoDB client factory
+- ❌ `infrastructure/caching/` - Caffeine cache manager
+- ❌ `core/mapper/` - Manual entity-DTO mappers
+- ❌ `bootstrap/` - Dependency injection (replaced by Spring)
+
+---
+
+## 🧪 Testing
+
+### Swagger UI Testing (Lab 5)
+Interactive API testing via Swagger UI at http://localhost:8080/swagger-ui.html
+
+**Tested Scenarios:**
+1. ✅ Create User (POST /api/users) - Created user "Prince" with id=7
+2. ✅ Create Post (POST /api/posts) - Created post id=74 "Introduction to Programming"
+3. ✅ Update Post (PUT /api/posts/74) - Updated title and published status
+4. ✅ Get All Posts (GET /api/posts) - Retrieved 22 published posts with pagination
+5. ✅ Search Posts (GET /api/posts/search) - Full-text search working
+
+### Manual API Testing with cURL
+
+**Create User:**
+```bash
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","email":"test@example.com","password":"pass123","role":"AUTHOR"}'
+```
+
+**Get All Posts:**
+```bash
+curl "http://localhost:8080/api/posts?page=0&size=10"
+```
+
+**Search Posts:**
+```bash
+curl "http://localhost:8080/api/posts/search?query=programming&page=0&size=10"
+```
+
+### Unit Testing
+JUnit 5 tests are located in `src/test/java/`. Run with:
+```bash
+./mvnw test
 ```
 
 ---
 
-## 🎨 UI Screenshots
+## 🔧 Known Issues & Future Work
+
+### Current Blockers (Lab 5)
+- ⚠️ **pom.xml Syntax Error**: GraphQL dependency blocked by XML syntax issues (// comments, misplaced tags)
+- 🔜 **Epic 4 Incomplete**: GraphQL schema and controllers not yet implemented
+
+### Deprecated Code to Remove
+- ⚠️ `module-info.java` - No longer needed for Spring Boot non-modular builds
+- ⚠️ Legacy security context classes (to be replaced with Spring Security)
+- ⚠️ Old performance report text files in workspace root
+
+### Future Enhancements
+- 🔐 Spring Security integration (JWT authentication)
+- 📧 Email notifications for comments
+- 🖼️ Image upload for post content
+- 📊 Analytics dashboard (REST endpoints for metrics)
+- 🔔 GraphQL subscriptions for real-time updates
+- 🐳 Docker containerization
+- ☁️ Azure deployment configuration
+
+---
+
+## 📈 Performance Notes
+
+### Database Optimizations (Lab 5)
+- ✅ HikariCP connection pool (15 max connections)
+- ✅ Full-text indexes on posts (title, content)
+- ✅ Composite indexes on post_tags (V2 migration)
+- ✅ Batch inserts enabled (batch_size=20)
+- ✅ Transaction isolation: READ_COMMITTED
+
+### Known Performance Considerations
+- Full-text search requires MySQL InnoDB full-text indexes (enabled in V3 migration)
+- Lazy loading relationships require `@Transactional` to prevent N+1 queries
+- Pagination recommended for large result sets (default size=10)
+
+---
+
+## 🎨 UI Screenshots (Deprecated - JavaFX Removed in Lab 5)
 
 ### Modern Dark Theme
-The application features a sleek dark theme with:
+The original desktop application featured a sleek dark theme with:
 - **Dark backgrounds**: `#12151a`, `#1a1d23`, `#1e222a`
 - **High-contrast text**: White (`#ffffff`) and light gray (`#e2e8f0`)
 - **Vibrant accent gradients**:
@@ -383,38 +759,13 @@ The application features a sleek dark theme with:
 - **Post Editor** - Rich text editing with tag assignment
 - **Performance Report** - Benchmark results with color-coded metrics
 
----
-
-## 📈 Performance Benchmarking
-
-The built-in Performance Benchmark tool measures query performance:
-
-### Features
-- **Cold + Warm Run Modes** - Test with and without cache
-- **Color-Coded Results**:
-  - 🟢 Green: < 10ms (Excellent)
-  - 🟡 Orange: 10-50ms (Good)
-  - 🔴 Red: > 50ms (Needs optimization)
-- **Export Reports** - Save benchmark results
-
-### Running Benchmarks
-1. Navigate to Admin Dashboard
-2. Click "⚡ Performance Report"
-3. Click "Run Cold + Warm" for comprehensive testing
-4. Review detailed results table
+**Note**: All JavaFX UI code has been removed in Lab 5 in favor of REST/GraphQL APIs with Swagger UI.
 
 ---
 
-## 🔄 MongoDB Migration
+## 🔄 MongoDB Migration (Deprecated)
 
-To migrate existing MySQL comments to MongoDB:
-
-```java
-// Run the migration utility
-java -cp target/classes com.smartblog.infrastructure.migration.CommentMongoMigrator
-```
-
-This copies all comments from MySQL to MongoDB with the `mysqlId` field for reference tracking.
+MongoDB dual-write functionality was removed in Lab 5 for architecture simplification. The project now uses MySQL-only persistence.
 
 ---
 
@@ -441,5 +792,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  Built with ❤️ using Java and JavaFX
+  Built with ❤️ using Java, Spring Boot, and REST/GraphQL APIs
 </p>
