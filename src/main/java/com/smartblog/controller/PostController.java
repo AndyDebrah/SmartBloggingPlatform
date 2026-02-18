@@ -1,8 +1,24 @@
 package com.smartblog.controller;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.smartblog.application.service.PostService;
 import com.smartblog.core.dto.ApiResponse;
+import com.smartblog.core.dto.PaginationMetadata;
 import com.smartblog.core.dto.PostDTO;
 import com.smartblog.core.dto.request.PostCreateRequest;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,10 +28,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 /**
  * REST API endpoints for Post management.
@@ -48,9 +60,9 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/posts - page={}, size={}", page, size);
-        List<PostDTO> posts = postService.list(page, size);
+        var posts = postService.list(page, size);
         return ResponseEntity.ok(
-                ApiResponse.success("Posts retrieved successfully", posts)
+                ApiResponse.success("Posts retrieved successfully", posts.getContent(), PaginationMetadata.from(posts))
         );
     }
 
@@ -74,9 +86,9 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/posts/search?q={}", q);
-        List<PostDTO> posts = postService.search(q, page, size);
+        var posts = postService.search(q, page, size);
         return ResponseEntity.ok(
-                ApiResponse.success("Search results for: " + q, posts)
+                ApiResponse.success("Search results for: " + q, posts.getContent(), PaginationMetadata.from(posts))
         );
     }
 
@@ -124,9 +136,9 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/posts/author/{}", authorId);
-        List<PostDTO> posts = postService.listByAuthor(authorId, page, size);
+        var posts = postService.listByAuthor(authorId, page, size);
         return ResponseEntity.ok(
-                ApiResponse.success("Posts by author retrieved", posts)
+                ApiResponse.success("Posts by author retrieved", posts.getContent(), PaginationMetadata.from(posts))
         );
     }
 

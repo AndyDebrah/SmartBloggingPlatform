@@ -664,7 +664,14 @@ SmartBloggingPlatform/
 
 ---
 
-## 🧪 Testing
+## Performance & Caching (Module 6)
+
+ - **Overview:** Module 6 adds service-layer caching (Caffeine via Spring Cache) for common read paths (`postView`, `postsByAuthor`, `userById`, `userByUsername`) and includes integration tests and benchmarks.
+ - **Run caching integration tests:**
+   - `mvn -Dspring.profiles.active=test -Dtest=com.smartblog.cache.CachingIntegrationTest test`
+ - **Run eviction & paged benchmark:**
+   - `mvn -Dspring.profiles.active=test -Dtest=com.smartblog.cache.EvictionAndPagedBenchmarkTest test`
+ - **Performance report template:** See `performance_report_module6.md` for commands and EXPLAIN guidance to run against MySQL/staging.
 
 ### Swagger UI Testing (Lab 5)
 Interactive API testing via Swagger UI at http://localhost:8080/swagger-ui.html

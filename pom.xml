@@ -187,29 +187,7 @@
         <!-- JAVAFX (provided scope - for UI compilation only, not runtime)  -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
         
-        <!-- JavaFX Controls: UI components (provided scope - compile only) -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>21.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <!-- JavaFX FXML: UI declarative markup (provided scope - compile only) -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>21.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <!-- JavaFX Web: WebView and HTMLEditor components (provided scope - compile only) -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>21.0.1</version>
-            <scope>provided</scope>
-        </dependency>
+        <!-- JavaFX dependencies are provided via the 'with-javafx' profile below -->
 
     </dependencies>
 
@@ -274,6 +252,8 @@
                     </compilerArgs>
                     <!-- Exclude legacy JavaFX files from compilation -->
                     <excludes>
+                        <!-- Broad exclusion for all UI sources under com.smartblog.ui -->
+                        <exclude>**/ui/**/*.java</exclude>
                         <exclude>**/ui/view/**/*.java</exclude>
                         <exclude>**/ui/navigation/**/*.java</exclude>
                         <exclude>**/ui/components/**/*.java</exclude>
@@ -286,4 +266,33 @@
             </plugin>
         </plugins>
     </build>
+    
+    <profiles>
+        <profile>
+            <id>with-javafx</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>21.0.1</version>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>21.0.1</version>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-web</artifactId>
+                    <version>21.0.1</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

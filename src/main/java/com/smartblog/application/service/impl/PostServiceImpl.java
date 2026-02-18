@@ -1,5 +1,16 @@
 package com.smartblog.application.service.impl;
 
+import java.util.Optional;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.smartblog.application.service.PostService;
 import com.smartblog.core.dto.PostDTO;
 import com.smartblog.core.mapper.PostMapper;
@@ -7,16 +18,9 @@ import com.smartblog.core.model.Post;
 import com.smartblog.core.model.User;
 import com.smartblog.infrastructure.repository.jpa.PostJpaRepository;
 import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Service implementation for Post business logic.
@@ -28,6 +32,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostJpaRepository postRepository;
     private final UserJpaRepository userRepository;
+    private final com.smartblog.infrastructure.repository.jpa.TagJpaRepository tagRepository;
 
     @Override
     @Transactional
@@ -50,8 +55,19 @@ public class PostServiceImpl implements PostService {
         return savedPost.getId();
     }
 
+    @Transactional
+    @CacheEvict(value = "postsByAuthor", key = "#authorId")
+    public long createDraft_evict(long authorId, String title, String content) {
+        // Backward-compatible entry point: delegate to createDraft
+        return createDraft(authorId, title, content);
+    }
+
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "postView", key = "#postId"),
+        @CacheEvict(value = "postsByAuthor", allEntries = true)
+    })
     public boolean publish(long postId) {
         return postRepository.findById(postId)
                 .map(post -> {
@@ -65,6 +81,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "postView", key = "#postId"),
+        @CacheEvict(value = "postsByAuthor", allEntries = true)
+    })
     public boolean update(long postId, String title, String content, boolean published) {
         return postRepository.findById(postId)
                 .map(post -> {
@@ -84,6 +104,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "postView", key = "#postId"),
+        @CacheEvict(value = "postsByAuthor", allEntries = true)
+    })
     public boolean softDelete(long postId) {
         return postRepository.findById(postId)
                 .map(post -> {
@@ -104,6 +128,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "postView", key = "#id")
     public Optional<PostDTO> getView(long id) {
         return postRepository.findById(id)
                 .filter(post -> !post.isDeleted())
@@ -112,59 +137,67 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDTO> list(int page, int size) {
+    public Page<PostDTO> list(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> postPage = postRepository.findByDeletedAtIsNull(pageable);
 
-        return postPage.getContent().stream()
-                .map(PostMapper::toDTO)
-                .toList();
+        return postPage.map(PostMapper::toDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDTO> search(String keyword, int page, int size) {
+    public Page<PostDTO> search(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Post> postPage = postRepository.searchByFullText(keyword, pageable);
-
-        return postPage.getContent().stream()
-                .map(PostMapper::toDTO)
-                .toList();
+        Page<Post> postPage;
+        try {
+            postPage = postRepository.searchByFullText(keyword, pageable);
+        } catch (Exception ex) {
+            postPage = postRepository.searchByTitleOrContent(keyword, pageable);
+        }
+        return postPage.map(PostMapper::toDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDTO> listByAuthor(long authorId, int page, int size) {
+    @Cacheable(value = "postsByAuthor", key = "#authorId + '-' + #page + '-' + #size")
+    public Page<PostDTO> listByAuthor(long authorId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> postPage = postRepository.findByAuthorId(authorId, pageable);
-
-        return postPage.getContent().stream()
-                .map(PostMapper::toDTO)
-                .toList();
+        return postPage.map(PostMapper::toDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDTO> searchByTag(String tag, int page, int size) {
-        // TODO: Implement tag-based search
-        log.warn("Tag-based search not yet implemented");
-        return List.of();
+    public Page<PostDTO> searchByTag(String tag, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return tagRepository.findByName(tag)
+                .map(t -> postRepository.findByTagsContaining(t, pageable))
+                .map(p -> p.map(PostMapper::toDTO))
+                .orElseGet(() -> Page.empty());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDTO> searchByAuthorName(String authorName, int page, int size) {
-        // TODO: Implement author name search
-        log.warn("Author name search not yet implemented");
-        return List.of();
+    public Page<PostDTO> searchByAuthorName(String authorName, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> pageRes = postRepository.findByAuthorUsernameLike(authorName, pageable);
+        return pageRes.map(PostMapper::toDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDTO> searchCombined(String keyword, String tag, String authorName, String sortBy, int page,
+    public Page<PostDTO> searchCombined(String keyword, String tag, String authorName, String sortBy, int page,
             int size) {
-        // TODO: Implement combined search with multiple filters
-        log.warn("Combined search not yet implemented");
-        return List.of();
+        // Prioritize keyword, then tag, then authorName — for complex combinations use Specifications
+        if (keyword != null && !keyword.isBlank()) {
+            return search(keyword, page, size);
+        }
+        if (tag != null && !tag.isBlank()) {
+            return searchByTag(tag, page, size);
+        }
+        if (authorName != null && !authorName.isBlank()) {
+            return searchByAuthorName(authorName, page, size);
+        }
+        return list(page, size);
     }
 }

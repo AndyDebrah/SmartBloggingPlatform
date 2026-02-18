@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -17,7 +18,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaAuditing
 @EnableAspectJAutoProxy
 @EnableJpaRepositories(basePackages = "com.smartblog.infrastructure.repository.jpa")
-@ComponentScan(basePackages = "com.smartblog")
+@ComponentScan(basePackages = "com.smartblog",
+    excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "com\\.smartblog\\.ui\\..*"))
 public class SmartBlogApplication {
     public static void main(String[] args) {
         SpringApplication.run(SmartBlogApplication.class, args);

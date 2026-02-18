@@ -1,20 +1,25 @@
 package com.smartblog.application.service.impl;
 
-import com.smartblog.application.service.UserService;
-import com.smartblog.core.dto.UserDTO;
-import com.smartblog.core.model.User;
-import com.smartblog.core.model.UserRole;
-import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import com.smartblog.application.service.UserService;
+import com.smartblog.core.dto.UserDTO;
+import com.smartblog.core.model.User;
+import com.smartblog.core.model.UserRole;
+import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service implementation for User business logic.
@@ -53,16 +58,27 @@ public class UserServiceImpl implements UserService {
         return savedUser.getId();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<UserDTO> get(long id) {
-        return userRepository.findById(id)
-                .filter(user -> !user.isDeleted())
-                .map(this::toDTO);
+    @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "userById", key = "#result"),
+        @CacheEvict(value = "userByUsername", allEntries = true)
+    })
+    public long register_evict(String username, String email, String rawPassword, String role) {
+        return register(username, email, rawPassword, role);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "userById", key = "#id")
+    public Optional<UserDTO> get(long id) {
+        return userRepository.findById(id)
+            .filter(user -> !user.isDeleted())
+            .map(this::toDTO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "userByUsername", key = "#username")
     public Optional<UserDTO> findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .filter(user -> !user.isDeleted())
@@ -95,6 +111,15 @@ public class UserServiceImpl implements UserService {
                 .orElse(false);
     }
 
+    @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "userById", key = "#id"),
+        @CacheEvict(value = "userByUsername", allEntries = true)
+    })
+    public boolean updateProfile_evict(long id, String email) {
+        return updateProfile(id, email);
+    }
+
     @Override
     @Transactional
     public boolean changePassword(long id, String oldRawPassword, String newRawPassword) {
@@ -114,6 +139,15 @@ public class UserServiceImpl implements UserService {
                     return true;
                 })
                 .orElse(false);
+    }
+
+    @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "userById", key = "#id"),
+        @CacheEvict(value = "userByUsername", allEntries = true)
+    })
+    public boolean softDelete_evict(long id) {
+        return softDelete(id);
     }
 
     @Override

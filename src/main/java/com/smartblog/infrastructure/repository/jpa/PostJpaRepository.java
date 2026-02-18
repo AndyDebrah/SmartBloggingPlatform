@@ -1,8 +1,7 @@
 package com.smartblog.infrastructure.repository.jpa;
 
-import com.smartblog.core.model.Post;
-import com.smartblog.core.model.Tag;
-import com.smartblog.core.model.User;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,9 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.smartblog.core.model.Post;
+import com.smartblog.core.model.Tag;
+import com.smartblog.core.model.User;
 
 @Repository
 public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
@@ -148,4 +147,11 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          */
         @Query("SELECT p FROM Post p WHERE p.author.id = :authorId AND p.deletedAt IS NULL")
         Page<Post> findByAuthorId(@Param("authorId") long authorId, Pageable pageable);
+
+        /**
+         * Find posts by author username (partial, case-insensitive)
+         */
+        @Query("SELECT p FROM Post p WHERE LOWER(p.author.username) LIKE LOWER(CONCAT('%', :username, '%')) " +
+                        "AND p.published = true AND p.deletedAt IS NULL")
+        Page<Post> findByAuthorUsernameLike(@Param("username") String username, Pageable pageable);
 }

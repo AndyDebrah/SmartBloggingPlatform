@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Service;
-
 import com.smartblog.core.dto.UserDTO;
 import com.smartblog.core.model.User;
 
-@Service
 public class TestUserServiceImpl implements UserService {
 
     @Override

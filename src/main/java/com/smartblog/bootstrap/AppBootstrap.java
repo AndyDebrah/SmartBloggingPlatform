@@ -1,49 +1,60 @@
 package com.smartblog.bootstrap;
 
-import com.smartblog.application.service.CommentService;
-import com.smartblog.application.service.PostService;
-import com.smartblog.application.service.TagService;
-import com.smartblog.application.service.UserService;
+import com.smartblog.core.dto.PostDTO;
+import com.smartblog.core.model.Tag;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Application bootstrap utility for UI initialization.
- * This is a placeholder to satisfy compilation dependencies for UI components.
+ * Lightweight bootstrap stub used to satisfy UI compile-time references in the server build.
+ * Provides minimal, no-op implementations for services accessed by JavaFX controllers.
  */
-public class AppBootstrap {
+public final class AppBootstrap {
 
-    /**
-     * Context holder for application services.
-     * This is a stub implementation to satisfy UI compilation dependencies.
-     */
-    public static class AppContext {
-        public final PostService postService;
-        public final CommentService commentService;
-        public final TagService tagService;
-        public final UserService userService;
+    private static final Context CTX = new Context();
 
-        public AppContext(PostService postService, CommentService commentService, TagService tagService, UserService userService) {
-            this.postService = postService;
-            this.commentService = commentService;
-            this.tagService = tagService;
-            this.userService = userService;
-        }
+    private AppBootstrap() {}
+
+    public static Context start() {
+        return CTX;
     }
 
-    /**
-     * Starts the application bootstrap process.
-     * Note: This is a stub implementation as UI components are excluded from compilation.
-     * @return AppContext with null services (UI not functional in this build)
-     */
-    public static AppContext start() {
-        // Stub implementation: returns context with null services
-        // UI functionality is not supported in API-only builds
-        return new AppContext(null, null, null, null);
+    public static class Context {
+        public final PostServiceBridge postService = new PostServiceBridge() {
+            @Override
+            public List<PostDTO> list(int page, int size) { return Collections.emptyList(); }
+
+            @Override
+            public List<PostDTO> searchCombined(String keyword, String author, String tag, String sortBy, int page, int size) { return Collections.emptyList(); }
+
+            @Override
+            public void publish(long postId) { /* no-op */ }
+        };
+
+        public final CommentServiceBridge commentService = new CommentServiceBridge() {
+            @Override
+            public List<?> listForPost(long postId, int page, int size) { return Collections.emptyList(); }
+        };
+
+        public final TagServiceBridge tagService = new TagServiceBridge() {
+            @Override
+            public List<Tag> list() { return Collections.emptyList(); }
+        };
     }
 
-    /**
-     * Private constructor to prevent instantiation.
-     */
-    private AppBootstrap() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    public interface PostServiceBridge {
+        List<PostDTO> list(int page, int size);
+        List<PostDTO> searchCombined(String keyword, String author, String tag, String sortBy, int page, int size);
+        void publish(long postId);
+    }
+
+    public interface CommentServiceBridge {
+        List<?> listForPost(long postId, int page, int size);
+    }
+
+    public interface TagServiceBridge {
+        List<Tag> list();
     }
 }
+
