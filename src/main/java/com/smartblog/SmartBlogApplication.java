@@ -3,6 +3,7 @@ package com.smartblog;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaAuditing
 @EnableAspectJAutoProxy
 @EnableJpaRepositories(basePackages = "com.smartblog.infrastructure.repository.jpa")
+@ComponentScan(basePackages = "com.smartblog")
 public class SmartBlogApplication {
     public static void main(String[] args) {
         SpringApplication.run(SmartBlogApplication.class, args);

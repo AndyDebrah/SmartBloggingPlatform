@@ -272,12 +272,12 @@
                         <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                         <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>
                     </compilerArgs>
-                    <!-- Exclude legacy JavaFX view files from compilation -->
+                    <!-- Exclude legacy JavaFX files from compilation -->
                     <excludes>
                         <exclude>**/ui/view/**/*.java</exclude>
                         <exclude>**/ui/navigation/**/*.java</exclude>
                         <exclude>**/ui/components/**/*.java</exclude>
-                        <exclude>**/ui/**/*.java</exclude>
+                        <exclude>**/ui/themes/**/*.java</exclude>
                         <exclude>**/bootstrap/**/*.java</exclude>
                         <exclude>**/infrastructure/migration/**/*.java</exclude>
                         <exclude>**/infrastructure/nosql/**/*.java</exclude>

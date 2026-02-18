@@ -1,9 +1,6 @@
 package com.smartblog.core.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -11,20 +8,11 @@ import java.time.LocalDateTime;
 
 /**
  * JPA Entity representing a comment on a blog post.
- * <p>
- * Includes validation constraints for data integrity.
- * </p>
+ * Validation is handled at the DTO layer, not at the entity level.
  *
  * <h3>Database Design:</h3>
  * <ul>
- *   <li>MySQL: Relational storage with foreign keys to posts and users</li>
- * </ul>
- *
- * <h3>Validation Rules:</h3>
- * <ul>
- *   <li>Content: Required, 1-5000 characters</li>
- *   <li>Post: Required foreign key reference</li>
- *   <li>User: Required foreign key reference</li>
+ * <li>MySQL: Relational storage with foreign keys to posts and users</li>
  * </ul>
  */
 @Entity
@@ -34,7 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"post", "user"})
+@ToString(exclude = { "post", "user" })
 public class Comment {
 
     /**
@@ -51,7 +39,6 @@ public class Comment {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    @NotNull(message = "Post is required")
     private Post post;
 
     /**
@@ -60,7 +47,6 @@ public class Comment {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @NotNull(message = "User is required")
     private User user;
 
     /**
@@ -68,8 +54,6 @@ public class Comment {
      * Stored as TEXT in MySQL for large content support.
      */
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
-    @NotBlank(message = "Comment content is required")
-    @Size(min = 1, max = 5000, message = "Comment must be between 1 and 5000 characters")
     private String content;
 
     /**
@@ -90,8 +74,8 @@ public class Comment {
     /**
      * Legacy constructor for backward compatibility with JDBC code.
      *
-     * @param postId Post ID (int for legacy support)
-     * @param userId User ID (int for legacy support)
+     * @param postId  Post ID (int for legacy support)
+     * @param userId  User ID (int for legacy support)
      * @param content Comment text
      */
     public Comment(int postId, int userId, String content) {

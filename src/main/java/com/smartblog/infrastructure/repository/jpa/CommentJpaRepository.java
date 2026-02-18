@@ -12,26 +12,13 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
-/**
- * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
- * EPIC 2: REST API DEVELOPMENT - COMMENT JPA REPOSITORY (MySQL)
- * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
- * Spring Data JPA repository for Comment entity (MySQL storage).
- *
- * <h2>Polyglot Persistence Note:</h2>
- * This repository handles MySQL storage. For MongoDB storage, see:
- * @see CommentMongoRepository
- *
- * The service layer decides which repository to use based on configuration.
- */
 @Repository
 public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Find all comments for a post
-     * Epic 2: Display comment thread
      *
-     * @param post Post to get comments for
+     * @param post     Post to get comments for
      * @param pageable Pagination and sorting parameters
      * @return Page of comments
      */
@@ -40,9 +27,8 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Find all comments by user
-     * Epic 2: User's comment history
      *
-     * @param user User who made the comments
+     * @param user     User who made the comments
      * @param pageable Pagination and sorting parameters
      * @return Page of comments
      */
@@ -51,7 +37,6 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Count comments for a post
-     * Epic 5: Analytics - post engagement
      *
      * @param post Post to count comments for
      * @return Count of comments
@@ -60,7 +45,6 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Count comments by user
-     * Epic 5: Analytics - user engagement
      *
      * @param user User who made the comments
      * @return Count of comments
@@ -69,12 +53,21 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Find recent comments (within last N days)
-     * Epic 2: "Recent Comments" feature
      *
-     * @param since Date to search from
+     * @param since    Date to search from
      * @param pageable Pagination and sorting parameters
      * @return Page of recent comments
      */
     @Query("SELECT c FROM Comment c WHERE c.createdAt >= :since AND c.deletedAt IS NULL ORDER BY c.createdAt DESC")
     Page<Comment> findRecentComments(@Param("since") LocalDateTime since, Pageable pageable);
+
+    /**
+     * Find all comments for a post by postId
+     *
+     * @param postId   ID of the post
+     * @param pageable Pagination and sorting parameters
+     * @return Page of comments
+     */
+    @Query("SELECT c FROM Comment c WHERE c.post.id = :postId AND c.deletedAt IS NULL ORDER BY c.createdAt DESC")
+    Page<Comment> findByPostIdAndDeletedAtIsNull(@Param("postId") long postId, Pageable pageable);
 }

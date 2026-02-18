@@ -9,13 +9,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
 
 /**
  * JPA entity representing a blog post.
+ * Validation is handled at the DTO layer, not at the entity level.
  *
  * Contains convenience methods for soft-delete, publish/unpublish and legacy
  * ID accessors used by DTO mappers.
@@ -28,7 +25,7 @@ import jakarta.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"author", "tags", "comments"})
+@ToString(exclude = { "author", "tags", "comments" })
 public class Post {
 
     @Id
@@ -36,20 +33,14 @@ public class Post {
     @Column(name = "id")
     private Long id;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    @NotNull(message = "Author is required")
     private User author;
 
     @Column(name = "title", nullable = false, length = 255)
-    @NotBlank(message = "Title is required")
-    @Size(min=3, max = 255, message = "Title must be at most 255 characters")
     private String title;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
-    @NotBlank(message = "Content is required")
-    @Size(min = 10,  message = "Content must be between 1 and 10000 characters")
     private String content;
 
     @Column(name = "published", nullable = false)
@@ -67,12 +58,8 @@ public class Post {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "post_tags",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @Builder.Default
     private Set<Tag> tags = new HashSet<>();
 
@@ -114,7 +101,6 @@ public class Post {
     public void unpublish() {
         this.published = false;
     }
-
 
     /**
      * Associate a tag with this post (bidirectional).
