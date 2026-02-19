@@ -576,6 +576,32 @@ springdoc.swagger-ui.path=/swagger-ui.html
 
 ---
 
+## Local .env Workflow
+
+For local development store sensitive credentials in a local `.env` file (NOT committed). A template is provided as `.env.example`.
+
+- Copy the template and edit your secrets:
+
+```powershell
+Copy-Item .\.env.example .\.env
+notepad .\.env
+```
+
+- Load the `.env` values into the current PowerShell session before running the app (process scope only):
+
+```powershell
+Get-Content .\.env |
+  Where-Object { $_ -and -not ($_ -match '^\s*#') } |
+  ForEach-Object { $kv = $_ -split '=',2; [System.Environment]::SetEnvironmentVariable($kv[0].Trim(), $kv[1].Trim(), 'Process') }
+
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+Notes:
+- Do NOT commit `.env` to source control. `.gitignore` already excludes it.
+- `application-local.properties` reads `DB_URL`, `DB_USER`, and `DB_PASS` from the environment when the `local` profile is used.
+
+
 ## 📁 Project Structure
 
 ```
