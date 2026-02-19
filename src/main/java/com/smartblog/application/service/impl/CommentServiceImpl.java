@@ -1,5 +1,11 @@
 package com.smartblog.application.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.smartblog.application.service.CommentService;
 import com.smartblog.core.dto.CommentDTO;
 import com.smartblog.core.mapper.CommentMapper;
@@ -9,15 +15,9 @@ import com.smartblog.core.model.User;
 import com.smartblog.infrastructure.repository.jpa.CommentJpaRepository;
 import com.smartblog.infrastructure.repository.jpa.PostJpaRepository;
 import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * Service implementation for Comment business logic.
@@ -82,12 +82,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CommentDTO> listForPost(long postId, int page, int size) {
+    public Page<CommentDTO> listForPost(long postId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Comment> commentPage = commentRepository.findByPostIdAndDeletedAtIsNull(postId, pageable);
 
-        return commentPage.getContent().stream()
-                .map(CommentMapper::toDTO)
-                .toList();
+        return commentPage.map(CommentMapper::toDTO);
     }
 }

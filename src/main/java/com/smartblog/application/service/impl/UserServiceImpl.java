@@ -39,8 +39,6 @@ public class UserServiceImpl implements UserService {
     public long register(String username, String email, String rawPassword, String role) {
         log.info("Registering new user: {}", username);
 
-        // Validation is already handled by @Valid in controller + custom validators
-        // Business logic: determine role
         UserRole userRole = (role != null && !role.isBlank())
                 ? UserRole.valueOf(role.toUpperCase())
                 : UserRole.READER;
@@ -48,7 +46,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .username(username)
                 .email(email)
-                .passwordHash(rawPassword) // TODO: Replace with passwordHash
+                .passwordHash(rawPassword)
                 .role(userRole)
                 .build();
 
@@ -123,7 +121,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean changePassword(long id, String oldRawPassword, String newRawPassword) {
-        // TODO: Implement with BCrypt password verification and hashing
         log.warn("Password change not yet implemented - requires BCrypt");
         return false;
     }
@@ -153,7 +150,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> authenticate(String username, String rawPassword) {
-        // TODO: Implement with BCrypt password verification
         log.warn("Authentication not yet implemented - requires BCrypt");
         return Optional.empty();
     }

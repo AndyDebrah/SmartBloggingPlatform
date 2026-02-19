@@ -1,7 +1,23 @@
 package com.smartblog.controller;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.smartblog.application.service.CommentService;
 import com.smartblog.core.dto.ApiResponse;
 import com.smartblog.core.dto.CommentDTO;
+import com.smartblog.core.dto.PaginationMetadata;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,10 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 /**
  * REST API endpoints for Comment management.
@@ -41,7 +53,7 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Post not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ApiResponse<List<CommentDTO>>> getCommentsByPost(
+        public ResponseEntity<ApiResponse<List<CommentDTO>>> getCommentsByPost(
             @Parameter(description = "Post ID")
             @PathVariable Long postId,
             @Parameter(description = "Page number (0-based)")
@@ -50,9 +62,9 @@ public class CommentController {
             @RequestParam(defaultValue = "20") int size
     ) {
         log.info("GET /api/comments/post/{}", postId);
-        List<CommentDTO> comments = commentService.listForPost(postId, page, size);
+        var comments = commentService.listForPost(postId, page, size);
         return ResponseEntity.ok(
-                ApiResponse.success("Comments retrieved successfully", comments)
+                ApiResponse.success("Comments retrieved successfully", comments.getContent(), PaginationMetadata.from(comments))
         );
     }
 

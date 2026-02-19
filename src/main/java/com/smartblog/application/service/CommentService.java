@@ -1,13 +1,13 @@
 
 package com.smartblog.application.service;
 
-import com.smartblog.core.dto.CommentDTO;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
+import com.smartblog.core.dto.CommentDTO;
 
 public interface CommentService {
     long add(long postId, long userId, String content);
     boolean edit(long commentId, String content);
     boolean remove(long commentId);
-    List<CommentDTO> listForPost(long postId, int page, int size);
+    Page<CommentDTO> listForPost(long postId, int page, int size);
 }

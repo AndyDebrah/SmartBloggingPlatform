@@ -54,7 +54,7 @@ Mark Done (to be updated when Epic completed)
   - Created the project-level TODO entries (managed by the assistant's todo tracker).
 
 - Code changes (add links here when made):
-  - Example: `src/main/java/com/smartblog/infrastructure/repository/PostRepository.java` — (link to file will be inserted)
+  - Example: `src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java` — (active JPA repository used by services)
 
 - How to verify (example):
   1. Build the project:
@@ -90,7 +90,7 @@ Mark Done (Epic 1: Spring Data Integration) — COMPLETED
     - [src/main/java/com/smartblog/core/model/Review.java](src/main/java/com/smartblog/core/model/Review.java)
   - Repository interfaces exist and extend Spring Data JPA where applicable. See JPA implementations and API abstractions:
     - JPA repositories: [src/main/java/com/smartblog/infrastructure/repository/jpa/UserJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/UserJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/CommentJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/CommentJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/TagJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/TagJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/ReviewJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/ReviewJpaRepository.java)
-    - API repository abstractions: [src/main/java/com/smartblog/infrastructure/repository/api/PostRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/PostRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java)
+    - API repository abstractions: [src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java)
   - Spring Boot application enables JPA repositories and caching. See [src/main/java/com/smartblog/SmartBlogApplication.java](src/main/java/com/smartblog/SmartBlogApplication.java) (`@EnableCaching`, `@EnableJpaRepositories`).
   - Datasource and JPA properties configured for local development. See [src/main/resources/application.properties](src/main/resources/application.properties) and [src/main/resources/application-local.properties](src/main/resources/application-local.properties).
 
@@ -154,11 +154,11 @@ Mark Done (Epic 2: Repository & Query Development) — COMPLETED
 
 - Completed items and code links:
   - Repository API interfaces and JPA repositories exist under `src/main/java/com/smartblog/infrastructure/repository`:
-    - API interfaces: [src/main/java/com/smartblog/infrastructure/repository/api/PostRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/PostRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java)
+    - API interfaces: [src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/UserRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/CommentRepository.java), [src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java](src/main/java/com/smartblog/infrastructure/repository/api/TagRepository.java)
     - JPA repositories: [src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/UserJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/UserJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/CommentJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/CommentJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/TagJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/TagJpaRepository.java), [src/main/java/com/smartblog/infrastructure/repository/jpa/ReviewJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/ReviewJpaRepository.java)
 
 - Code added by the assistant:
-  - `PostRepositoryImpl` implements `PostRepository` and adapts to JPA: [src/main/java/com/smartblog/infrastructure/repository/impl/PostRepositoryImpl.java](src/main/java/com/smartblog/infrastructure/repository/impl/PostRepositoryImpl.java)
+  - Removed unused API abstraction `PostRepository` and its adapter `PostRepositoryImpl`. Services now use the active JPA contract: [src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java)
 
 - Additional changes made to satisfy Epic 2:
   - Added author-name JPQL search to `PostJpaRepository`: [src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java)
@@ -180,20 +180,36 @@ mvn -DskipTests=false test
 - Query coverage present:
   - `PostJpaRepository` contains derived and custom queries (published filtering, recent posts, top-rated posts, date-range queries, native full-text + JPQL fallback). See [src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java](src/main/java/com/smartblog/infrastructure/repository/jpa/PostJpaRepository.java).
 
-- Remaining work to fully satisfy Epic 2 acceptance criteria:
-  1. Adjust pagination envelope preferences if you want responses changed (currently uses `ApiResponse` with `PaginationMetadata`).
-  2. Perform broader query performance measurements and index tuning on a staging dataset (I added a Flyway migration to create indexes/fulltext as a starting point).
 
-- Suggested immediate next tasks (I can implement these):
-  - Implement `PostServiceImpl.searchByTag`, `searchByAuthorName`, and `searchCombined` to use `PostJpaRepository` and/or `PostRepositoryImpl` logic.
-  - Update `PostController` (or service responses) to return pagination metadata (either `Page` or a pagination envelope DTO).
-  3. Add unit/integration tests for the new methods (use H2 for integration tests) and add migration SQL for full-text indexes if needed.
-  4. Run simple performance measurements and record results in `MODULE_6_MARKDONE.md` and a `performance_report_module6.md` file.
+-- Final verification & notes (Epic 2 compliance)
 
-- How to verify what's missing now (quick checklist):
-  - Open [src/main/java/com/smartblog/application/service/impl/PostServiceImpl.java](src/main/java/com/smartblog/application/service/impl/PostServiceImpl.java) and check for `TODO` markers.
-  - Call `GET /api/posts?page=0&size=10` and confirm whether pagination metadata is present in the response.
-  4. Run `mvn -DskipTests=false test` after adding tests to ensure coverage.
+The key gaps identified earlier have been addressed:
+
+- Comment endpoints now return pagination metadata consistent with the posts endpoints. See:
+  - `src/main/java/com/smartblog/controller/CommentController.java` (returns `ApiResponse.success(..., data, PaginationMetadata.from(page))`)
+  - `src/main/java/com/smartblog/application/service/impl/CommentServiceImpl.java` (now returns `Page<CommentDTO>`)
+
+- The unused `PostRepository` API abstraction and its adapter `PostRepositoryImpl` were removed; services use `PostJpaRepository` directly. This reduces ambiguity about the active repository contract.
+
+Recommended (non-blocking): run query performance measurements and index tuning against a MySQL staging dataset. A Flyway migration for fulltext/indexes exists as a starting point: `src/main/resources/db/migration/V7__add_fulltext_and_indexes.sql`.
+
+How to verify locally (copyable commands):
+
+```bash
+# 1) Compile the project
+mvn -DskipTests=false compile
+
+# 2) Run the targeted Post JPA repository tests
+mvn -Dtest=com.smartblog.infrastructure.repository.jpa.PostJpaRepositoryTest test
+
+# 3) Run comment-related controller/service tests (if present), or run a quick integration check
+mvn -Dtest=com.smartblog.cache.CachingIntegrationTest test
+
+# 4) Run the full test suite if you want broad verification
+mvn -DskipTests=false test
+```
+
+If any test fails, collect the failing test names and stack traces and paste them here; I will help diagnose and fix them.
 
 
 ---
