@@ -5,6 +5,7 @@ import com.smartblog.core.model.Review;
 import com.smartblog.core.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,6 +29,7 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
      * @return Page of reviews
      */
     @Query("SELECT r FROM Review r WHERE r.post = :post AND r.deletedAt IS NULL ORDER BY r.createdAt DESC")
+    @EntityGraph(attributePaths = { "post", "user" })
     Page<Review> findByPost(@Param("post") Post post, Pageable pageable);
 
     /**
@@ -36,6 +38,7 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
      * @return Page of reviews
      */
     @Query("SELECT r FROM Review r WHERE r.user = :user AND r.deletedAt IS NULL ORDER BY r.createdAt DESC")
+    @EntityGraph(attributePaths = { "post", "user" })
     Page<Review> findByUser(@Param("user") User user, Pageable pageable);
 
     /**

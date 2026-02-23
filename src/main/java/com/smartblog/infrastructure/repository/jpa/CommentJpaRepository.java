@@ -5,6 +5,7 @@ import com.smartblog.core.model.Post;
 import com.smartblog.core.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,6 +24,7 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
      * @return Page of comments
      */
     @Query("SELECT c FROM Comment c WHERE c.post = :post AND c.deletedAt IS NULL ORDER BY c.createdAt DESC")
+    @EntityGraph(attributePaths = { "post", "user" })
     Page<Comment> findByPost(@Param("post") Post post, Pageable pageable);
 
     /**
@@ -33,6 +35,7 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
      * @return Page of comments
      */
     @Query("SELECT c FROM Comment c WHERE c.user = :user AND c.deletedAt IS NULL ORDER BY c.createdAt DESC")
+    @EntityGraph(attributePaths = { "post", "user" })
     Page<Comment> findByUser(@Param("user") User user, Pageable pageable);
 
     /**
@@ -59,6 +62,7 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
      * @return Page of recent comments
      */
     @Query("SELECT c FROM Comment c WHERE c.createdAt >= :since AND c.deletedAt IS NULL ORDER BY c.createdAt DESC")
+    @EntityGraph(attributePaths = { "post", "user" })
     Page<Comment> findRecentComments(@Param("since") LocalDateTime since, Pageable pageable);
 
     /**
@@ -69,5 +73,6 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
      * @return Page of comments
      */
     @Query("SELECT c FROM Comment c WHERE c.post.id = :postId AND c.deletedAt IS NULL ORDER BY c.createdAt DESC")
+    @EntityGraph(attributePaths = { "post", "user" })
     Page<Comment> findByPostIdAndDeletedAtIsNull(@Param("postId") long postId, Pageable pageable);
 }

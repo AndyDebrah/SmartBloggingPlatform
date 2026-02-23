@@ -3,6 +3,7 @@ package com.smartblog.graphql;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -47,7 +48,7 @@ public class UserGraphQLController {
         User user = User.builder()
                 .username(input.username())
                 .email(input.email())
-                .passwordHash(input.password()) // Should hash in production
+                .passwordHash(BCrypt.hashpw(input.password(), BCrypt.gensalt()))
                 .role(mapRole(input.role()))
                 .displayName(input.displayName())
                 .bio(input.bio())

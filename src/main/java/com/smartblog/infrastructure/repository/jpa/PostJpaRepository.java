@@ -1,9 +1,11 @@
 package com.smartblog.infrastructure.repository.jpa;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +26,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          * @return Page of published posts
          */
         @Query("SELECT p FROM Post p WHERE p.published = true AND p.deletedAt IS NULL")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findAllPublished(Pageable pageable);
 
         /**
@@ -33,6 +36,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          * @param pageable Pagination and sorting parameters
          * @return Page of posts by author
          */
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findByAuthor(User author, Pageable pageable);
 
         /**
@@ -43,6 +47,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          * @return Page of published posts by author
          */
         @Query("SELECT p FROM Post p WHERE p.author = :author AND p.published = true AND p.deletedAt IS NULL")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findPublishedByAuthor(@Param("author") User author, Pageable pageable);
 
         /**
@@ -53,6 +58,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          * @return Page of posts with specified tag
          */
         @Query("SELECT p FROM Post p JOIN p.tags t WHERE t = :tag AND p.published = true AND p.deletedAt IS NULL")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findByTagsContaining(@Param("tag") Tag tag, Pageable pageable);
 
         /**
@@ -76,6 +82,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
         @Query("SELECT p FROM Post p WHERE (LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
                         "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
                         "AND p.published = true AND p.deletedAt IS NULL")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> searchByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
 
         /**
@@ -97,6 +104,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          * 
          * @return Page of active posts
          */
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findByDeletedAtIsNull(Pageable pageable);
 
         /**
@@ -124,6 +132,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
         @Query("SELECT p FROM Post p WHERE p.createdAt >= :since " +
                         "AND p.published = true AND p.deletedAt IS NULL " +
                         "ORDER BY p.createdAt DESC")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findRecentPosts(@Param("since") LocalDateTime since, Pageable pageable);
 
         /**
@@ -136,6 +145,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
                         "WHERE p.published = true AND p.deletedAt IS NULL " +
                         "GROUP BY p.id " +
                         "ORDER BY AVG(r.rating) DESC, COUNT(r.id) DESC")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findTopRatedPosts(Pageable pageable);
 
         /**
@@ -146,6 +156,7 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          * @return Page of posts by author
          */
         @Query("SELECT p FROM Post p WHERE p.author.id = :authorId AND p.deletedAt IS NULL")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findByAuthorId(@Param("authorId") long authorId, Pageable pageable);
 
         /**
@@ -153,5 +164,10 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
          */
         @Query("SELECT p FROM Post p WHERE LOWER(p.author.username) LIKE LOWER(CONCAT('%', :username, '%')) " +
                         "AND p.published = true AND p.deletedAt IS NULL")
+        @EntityGraph(attributePaths = { "author" })
         Page<Post> findByAuthorUsernameLike(@Param("username") String username, Pageable pageable);
+
+        @EntityGraph(attributePaths = { "author", "tags" })
+        @Query("SELECT DISTINCT p FROM Post p WHERE p.id IN :ids")
+        List<Post> findWithAuthorAndTagsByIdIn(@Param("ids") List<Long> ids);
 }

@@ -13,7 +13,7 @@ for($i=1; $i -le $Runs; $i++){
     mysql -u $User -p -D $Database -e "$Query" > $null
     $elapsed = (Get-Date) - $start
     $ms = [math]::Round($elapsed.TotalMilliseconds,2)
-    Write-Host "Run $i: $ms ms"
+    Write-Host ("Run {0}: {1} ms" -f $i, $ms)
     $results += $ms
 }
 

@@ -1,6 +1,10 @@
 package com.smartblog.application.service.impl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,6 +40,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "postsByAuthor", allEntries = true)
     public long createDraft(long authorId, String title, String content) {
         log.info("Creating draft post for author ID: {}", authorId);
 
@@ -53,13 +58,6 @@ public class PostServiceImpl implements PostService {
         log.info("Draft post created with ID: {}", savedPost.getId());
 
         return savedPost.getId();
-    }
-
-    @Transactional
-    @CacheEvict(value = "postsByAuthor", key = "#authorId")
-    public long createDraft_evict(long authorId, String title, String content) {
-        // Backward-compatible entry point: delegate to createDraft
-        return createDraft(authorId, title, content);
     }
 
     @Override
@@ -140,8 +138,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostDTO> list(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> postPage = postRepository.findByDeletedAtIsNull(pageable);
-
-        return postPage.map(PostMapper::toDTO);
+        return mapToDtoPage(postPage);
     }
 
     @Override
@@ -154,7 +151,7 @@ public class PostServiceImpl implements PostService {
         } catch (Exception ex) {
             postPage = postRepository.searchByTitleOrContent(keyword, pageable);
         }
-        return postPage.map(PostMapper::toDTO);
+        return mapToDtoPage(postPage);
     }
 
     @Override
@@ -163,7 +160,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostDTO> listByAuthor(long authorId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> postPage = postRepository.findByAuthorId(authorId, pageable);
-        return postPage.map(PostMapper::toDTO);
+        return mapToDtoPage(postPage);
     }
 
     @Override
@@ -172,7 +169,7 @@ public class PostServiceImpl implements PostService {
         Pageable pageable = PageRequest.of(page, size);
         return tagRepository.findByName(tag)
                 .map(t -> postRepository.findByTagsContaining(t, pageable))
-                .map(p -> p.map(PostMapper::toDTO))
+                .map(this::mapToDtoPage)
                 .orElseGet(() -> Page.empty());
     }
 
@@ -181,7 +178,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostDTO> searchByAuthorName(String authorName, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> pageRes = postRepository.findByAuthorUsernameLike(authorName, pageable);
-        return pageRes.map(PostMapper::toDTO);
+        return mapToDtoPage(pageRes);
     }
 
     @Override
@@ -199,5 +196,17 @@ public class PostServiceImpl implements PostService {
             return searchByAuthorName(authorName, page, size);
         }
         return list(page, size);
+    }
+
+    private Page<PostDTO> mapToDtoPage(Page<Post> postPage) {
+        List<Long> ids = postPage.getContent().stream().map(Post::getId).toList();
+        if (ids.isEmpty()) {
+            return postPage.map(PostMapper::toDTO);
+        }
+
+        Map<Long, Post> hydratedPosts = postRepository.findWithAuthorAndTagsByIdIn(ids).stream()
+                .collect(Collectors.toMap(Post::getId, Function.identity()));
+
+        return postPage.map(post -> PostMapper.toDTO(hydratedPosts.getOrDefault(post.getId(), post)));
     }
 }

@@ -3,6 +3,7 @@ package com.smartblog.core.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = { "post", "user" })
+@EntityListeners(AuditingEntityListener.class)
 public class Comment {
 
     /**

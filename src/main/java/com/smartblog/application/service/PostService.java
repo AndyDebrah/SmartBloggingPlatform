@@ -3,20 +3,14 @@ package com.smartblog.application.service;
 
 import java.util.Optional;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 
 import com.smartblog.core.dto.PostDTO;
 import com.smartblog.core.model.Post;
-import org.springframework.transaction.annotation.Transactional;
 
 
 public interface PostService {
     long createDraft(long authorId, String title, String content);
-
-    @Transactional
-    @CacheEvict(value = "postsByAuthor", key = "#authorId")
-    long createDraft_evict(long authorId, String title, String content);
 
     boolean publish(long postId);
     boolean update(long postId, String title, String content, boolean published);
