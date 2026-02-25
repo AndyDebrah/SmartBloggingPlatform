@@ -1,6 +1,7 @@
 package com.smartblog.aop;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -42,7 +43,7 @@ public class CrossCuttingAspect {
         String className = joinPoint.getSignature().getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
-        LOG.info("AOP @Before: Entering method {}.{} with arguments {}", className, methodName, Arrays.toString(args));
+        LOG.info("AOP @Before: Entering method {}.{} with arguments {}", className, methodName, formatArgs(args));
     }
 
     @AfterReturning(pointcut = "serviceLayer()", returning = "result")
@@ -106,6 +107,10 @@ public class CrossCuttingAspect {
             return "null";
         }
 
+        if (result instanceof Optional<?> optional) {
+            return optional.map(this::summarizeObject).map(v -> "Optional[" + v + "]").orElse("Optional.empty");
+        }
+
         // For collections, show type and size instead of entire contents
         if (result instanceof java.util.Collection<?> collection) {
             return String.format("Collection<%s>[size=%d]",
@@ -113,12 +118,32 @@ public class CrossCuttingAspect {
                     collection.size());
         }
 
-        // For other objects, use toString() but limit length
-        String str = result.toString();
+        // Avoid calling toString() on entity/proxy objects to prevent lazy-loading side effects.
+        String str = summarizeObject(result);
         if (str.length() > 100) {
             return str.substring(0, 97) + "...";
         }
         return str;
+    }
+
+    private String formatArgs(Object[] args) {
+        if (args == null || args.length == 0) {
+            return "[]";
+        }
+        return Arrays.stream(args).map(this::summarizeObject).toList().toString();
+    }
+
+    private String summarizeObject(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+        if (obj instanceof String s) {
+            return s;
+        }
+        if (obj instanceof Number || obj instanceof Boolean || obj instanceof Enum<?>) {
+            return String.valueOf(obj);
+        }
+        return obj.getClass().getSimpleName() + "@" + Integer.toHexString(System.identityHashCode(obj));
     }
 
     /** Return the current benchmark report. */

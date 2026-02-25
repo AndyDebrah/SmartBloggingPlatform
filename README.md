@@ -734,6 +734,39 @@ JUnit 5 tests are located in `src/test/java/`. Run with:
 ./mvnw test
 ```
 
+### Security Testing (Epic 3): CORS vs CSRF
+
+#### CORS vs CSRF (Practical)
+- **CORS** controls which browser origins can call your API. It is enforced by the browser and configured by response headers.
+- **CSRF** protects cookie-based authenticated flows from forged state-changing requests.
+- In this project:
+  - JWT/API routes are stateless and CSRF checks are ignored for those API paths.
+  - Browser form demo routes are CSRF-protected and require a valid CSRF token.
+
+#### Browser CSRF Demo
+1. Open `http://localhost:8080/form/csrf`.
+2. Submit the rendered form.
+3. Expected: `201 Created` with response body starting with `received:`.
+4. Inspect cookies and confirm `XSRF-TOKEN` is issued for the CSRF-protected flow.
+
+#### Postman CSRF Demo
+1. `GET /form/csrf` and copy hidden token value (`_csrf`) from HTML response.
+2. `POST /form/submit` with form-data:
+   - `message=hello`
+   - `_csrf=<token from step 1>`
+3. Expected: `201 Created`.
+4. Retry `POST /form/submit` without `_csrf`.
+5. Expected: `403 Forbidden`.
+
+#### Postman CORS Preflight Simulation
+1. `OPTIONS /auth/login` with headers:
+   - `Origin: http://localhost:3000`
+   - `Access-Control-Request-Method: POST`
+   Expected: allowed preflight.
+2. Repeat with:
+   - `Origin: http://evil.example.com`
+   Expected: rejected preflight (`403`).
+
 ---
 
 ## 🔧 Known Issues & Future Work
@@ -827,3 +860,29 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <p align="center">
   Built with ❤️ using Java, Spring Boot, and REST/GraphQL APIs
 </p>
+## Epic 5 Security Monitoring
+
+The platform includes in-memory security telemetry for authentication and authorization events.
+
+- Structured events are logged with `security_event=...` markers for:
+  - login attempts/success/failure
+  - OAuth2 login success
+  - token validation success/failure
+  - refresh success/failure
+  - token revocation
+  - unauthorized/access denied
+- Admin-only report endpoint:
+  - `GET /admin/security-report`
+  - Requires `ROLE_ADMIN`
+  - Returns counters, failed-logins-by-principal, and `suspiciousPrincipals` (failure count >= threshold)
+
+### Quick Test (Postman)
+
+1. Login as admin to obtain JWT.
+2. Call `GET /admin/security-report` with `Authorization: Bearer <admin_token>`.
+3. Verify response includes:
+   - `loginAttempts`
+   - `loginFailures`
+   - `tokenValidationFailures`
+   - `loginFailuresByPrincipal`
+   - `suspiciousPrincipals`

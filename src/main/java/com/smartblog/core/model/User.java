@@ -25,7 +25,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = { "posts" })
+@ToString(exclude = { "posts", "comments" })
 public class User {
 
     @Id

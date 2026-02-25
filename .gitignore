@@ -46,3 +46,4 @@ application-dev.properties
 # Performance reports and notes
 performance_report_*.txt
 .consolidation-notes.md
+/config/

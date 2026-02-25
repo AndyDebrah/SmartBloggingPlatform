@@ -1,21 +1,27 @@
 package com.smartblog.application.exception;
 
-import com.smartblog.core.dto.ApiResponse;
-import com.smartblog.core.exceptions.DuplicateException;
-import com.smartblog.core.exceptions.NotAuthorizedException;
-import com.smartblog.core.exceptions.NotFoundException;
-import com.smartblog.core.exceptions.ValidationException;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.security.core.AuthenticationException;
+import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.smartblog.core.dto.ApiResponse;
+import com.smartblog.auth.SecurityEventMetricsService;
+import com.smartblog.core.exceptions.DuplicateException;
+import com.smartblog.core.exceptions.NotAuthorizedException;
+import com.smartblog.core.exceptions.NotFoundException;
+import com.smartblog.core.exceptions.ValidationException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Global exception handler for all REST controllers.
@@ -40,6 +46,11 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    private final SecurityEventMetricsService securityEvents;
+
+    public GlobalExceptionHandler(SecurityEventMetricsService securityEvents) {
+        this.securityEvents = securityEvents;
+    }
 
     /**
      * Handles validation exceptions from business logic.
@@ -145,6 +156,24 @@ public class GlobalExceptionHandler {
      * @param ex Any uncaught exception
      * @return 500 INTERNAL_SERVER_ERROR with generic error message
      */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        securityEvents.recordAccessDenied(request.getRequestURI(), request.getRemoteUser());
+        log.warn("Access denied: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(HttpStatus.FORBIDDEN, "Access is denied"));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException ex, HttpServletRequest request) {
+        securityEvents.recordUnauthorized(request.getRequestURI(), ex.getClass().getSimpleName());
+        log.warn("Authentication failed: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneralException(Exception ex) {
         log.error("Unexpected error occurred", ex);
