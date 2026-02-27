@@ -1,888 +1,375 @@
-# 📝 SmartBloggingPlatform
+# SmartBloggingPlatform
 
-A modern, enterprise-grade blogging platform built with **Java 21**, **Spring Boot 3.2.2**, and **MySQL 8.0**. Originally a JavaFX desktop application, now transformed into a RESTful web service with GraphQL support (Lab 5).
+SmartBloggingPlatform is a Spring Boot backend for blogging features (users, posts, comments, tags, reviews) with layered architecture, MySQL persistence, REST APIs, GraphQL endpoint support, and production-oriented security.
 
-![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.2-brightgreen?style=flat-square&logo=springboot)
-![MySQL](https://img.shields.io/badge/MySQL-8.x-blue?style=flat-square&logo=mysql)
-![Maven](https://img.shields.io/badge/Maven-3.8+-red?style=flat-square&logo=apachemaven)
-![Swagger](https://img.shields.io/badge/Swagger-OpenAPI%203.0-green?style=flat-square&logo=swagger)
-![GraphQL](https://img.shields.io/badge/GraphQL-16.2.0-E10098?style=flat-square&logo=graphql)
+## Table of Contents
 
----
+- [1. Project Overview](#1-project-overview)
+- [2. Architecture](#2-architecture)
+- [3. Technology Stack](#3-technology-stack)
+- [4. Getting Started](#4-getting-started)
+- [5. Configuration](#5-configuration)
+- [6. API Documentation](#6-api-documentation)
+- [7. Data Model Summary](#7-data-model-summary)
+- [8. Testing Guide](#8-testing-guide)
+- [9. Performance Notes](#9-performance-notes)
+- [10. Module 7 Security Enhancement Report (Epic 1-5)](#10-module-7-security-enhancement-report-epic-1-5)
 
-## 📋 Table of Contents
+## 1. Project Overview
 
-- [Lab 5 Achievements](#-lab-5-achievements)
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Technology Stack](#-technology-stack)
-- [API Documentation](#-api-documentation)
-- [Database Schema](#-database-schema)
-- [Getting Started](#-getting-started)
-- [Configuration](#-configuration)
-- [Project Structure](#-project-structure)
-- [Testing](#-testing)
-- [Contributing](#-contributing)
+This project was evolved from a desktop-first implementation to a backend-first service architecture.
 
----
+Core capabilities:
+- REST APIs for users, posts, comments, tags, reviews
+- OpenAPI/Swagger documentation
+- GraphQL endpoint and GraphiQL UI
+- Spring Security with JWT and OAuth2 (Google)
+- RBAC (`ADMIN`, `AUTHOR`, `READER`)
+- CSRF strategy for browser form flows
+- Security monitoring/reporting endpoint for administrators
 
-## 🎓 Lab 5 Achievements
+## 2. Architecture
 
-### Epic 3: REST API Development ✅ COMPLETE
+The backend uses layered architecture:
 
-#### What We Built
-Transformed the JavaFX desktop application into a modern RESTful web service with the following features:
+1. Web layer
+- REST controllers and security entry points
 
-**1. REST Controllers Implemented:**
-- ✅ **PostController** - Full CRUD for blog posts with pagination and search
-- ✅ **CommentController** - Comment management with post/user filtering
-- ✅ **UserController** - User operations with role-based access
-- ✅ **TagController** - Tag management with popularity tracking
-- ✅ **ReviewController** - Post reviews and rating statistics
+2. Application layer
+- Business services, DTOs, validation, auth/token services
 
-**2. Key Technical Achievements:**
-- ✅ **Swagger UI Integration** - Interactive API documentation at `/swagger-ui.html`
-- ✅ **Transaction Management** - All endpoints properly annotated with `@Transactional`
-- ✅ **Lazy Loading Fix** - Resolved all `LazyInitializationException` errors across controllers
-- ✅ **DTO Pattern** - Clean separation using `PostDTO`, `CommentDTO`, `UserDTO`, etc.
-- ✅ **Pagination Support** - Implemented `Pageable` for all list endpoints
-- ✅ **MongoDB Removal** - Simplified architecture by removing dual-write complexity
-- ✅ **Legacy Code Cleanup** - Deleted all JavaFX UI code, JDBC repositories, and mappers
+3. Infrastructure layer
+- JPA repositories, Flyway migrations, optional Redis-backed revocation
 
-**3. Successfully Tested Operations:**
-| Operation | Endpoint | Status | Notes |
-|-----------|----------|--------|-------|
-| Create User | `POST /api/users` | ✅ | User "Prince" created (id=7) |
-| Create Post | `POST /api/posts` | ✅ | Post "Introduction to Programming" (id=74) |
-| Update Post | `PUT /api/posts/74` | ✅ | Updated title and published status |
-| Get All Posts | `GET /api/posts` | ✅ | Returns 22 published posts with pagination |
-| Search Posts | `GET /api/posts/search` | ✅ | Full-text search working |
+4. Data layer
+- MySQL primary relational database
 
-**4. Architecture Improvements:**
-```
-Before (Lab 1-4):                After (Lab 5):
-JavaFX Desktop App               RESTful Web Service
-├── UI Layer (FXML)              ├── REST Controllers
-├── Service Layer                ├── Service Layer (unchanged)
-├── JDBC Repositories            ├── JPA Repositories
-├── MongoDB (dual-write)         ├── MySQL only
-└── MySQL                        └── Swagger Documentation
-```
+## 3. Technology Stack
 
-**5. Configuration Highlights:**
-- **HikariCP Connection Pool**: max-pool-size=15, optimized for concurrent requests
-- **Flyway Migrations**: 3 versions applied (init, indexes, full-text search)
-- **Spring Data JPA**: Hibernate 6.4.1.Final with MySQL8Dialect
-- **Profile-Based Config**: `application-local.properties` for development
-- **Transaction Isolation**: `READ_COMMITTED` for consistent reads
+- Java 21
+- Spring Boot 3.2.x
+- Spring Web + Spring Data JPA + Spring Security
+- OAuth2 Client (Google login)
+- jjwt (JWT generation/validation)
+- Flyway (DB migrations)
+- MySQL 8
+- Optional Redis for distributed revocation store
+- springdoc-openapi + Swagger UI
+- JUnit 5 / MockMvc tests
 
-### Epic 4: GraphQL Integration 🔄 IN PROGRESS
-
-**Status:** Blocked by `pom.xml` syntax errors
-
-**Planned Implementation:**
-1. ⏳ Add `spring-boot-starter-graphql` dependency (currently blocked)
-2. 🔜 Create GraphQL schema file (`schema.graphqls`)
-3. 🔜 Implement GraphQL controllers with `@QueryMapping` and `@MutationMapping`
-4. 🔜 Enable GraphiQL interface at `/graphiql`
-5. 🔜 Test queries and mutations for User, Post, Comment, Tag, Review
-
-**Expected Benefits:**
-- Flexible data fetching (clients request only needed fields)
-- Reduced over-fetching compared to REST
-- Single endpoint for all operations
-- Strong typing with GraphQL schema
-
----
-
-## ✨ Features
-
-### Core REST API Functionality (Lab 5)
-- 📝 **Blog Post Management** - Create, update, delete, publish posts via REST endpoints
-- 👥 **User Management** - RESTful user CRUD with role support (Admin, Author)
-- 💬 **Comments System** - Full comment management with JPA persistence
-- 🏷️ **Tag Management** - Organize posts with tags and slug-based URLs
-- ⭐ **Review System** - Post reviews with rating statistics
-- 🔍 **Full-Text Search** - MySQL full-text indexing on posts (title + content)
-- 📊 **Pagination Support** - All list endpoints support page/size parameters
-- 📖 **Swagger UI** - Interactive API documentation and testing at `/swagger-ui.html`
-
-### Technical Features
-- 🗄️ **Spring Data JPA** - Repository pattern with Hibernate ORM
-- ⚡ **Transaction Management** - Proper `@Transactional` annotations preventing lazy-loading errors
-- 🔄 **Database Migrations** - Flyway for version-controlled schema management
-- 🔐 **Secure Authentication** - BCrypt password hashing (legacy from JavaFX era)
-- 📈 **HikariCP Connection Pool** - Optimized database connection management
-- 🎯 **DTO Pattern** - Clean data transfer with validation annotations
-- 🚀 **GraphQL Support** - Coming in Epic 4 (in progress)
-
-### Deprecated Features (Removed in Lab 5)
-- ❌ **JavaFX Desktop UI** - Migrated to REST API
-- ❌ **MongoDB Dual-Write** - Simplified to MySQL-only persistence
-- ❌ **JDBC Repositories** - Replaced with Spring Data JPA
-- ❌ **Caffeine Caching** - Removed during architecture simplification
-
----
-
-## 🏗️ Architecture
-
-The application follows a **Spring Boot layered architecture** with REST API endpoints:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      REST API Layer                         │
-│   (Controllers, Swagger UI, GraphQL - coming soon)          │
-├─────────────────────────────────────────────────────────────┤
-│                   Application Layer                         │
-│   (Services, DTOs, Security, Utilities)                     │
-├─────────────────────────────────────────────────────────────┤
-│                   Infrastructure Layer                      │
-│   (JPA Repositories, Transaction Management, Flyway)        │
-├─────────────────────────────────────────────────────────────┤
-│                     Data Layer                              │
-│                  ┌─────────────────┐                        │
-│                  │     MySQL       │                        │
-│                  │ (Smart_Blog DB) │                        │
-│                  └─────────────────┘                        │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Key Design Patterns
-- **Repository Pattern** - Spring Data JPA repositories
-- **Service Layer Pattern** - Business logic encapsulation
-- **DTO Pattern** - Data transfer with Java Records and validation
-- **Controller Pattern** - REST endpoints with `@RestController`
-- **Transaction Management** - Declarative `@Transactional` annotations
-
-### Migration Journey (Lab 5)
-```
-JavaFX Desktop (Labs 1-4)  →  Spring Boot REST API (Lab 5)
-├── FXML Controllers       →  REST Controllers
-├── JDBC Repositories      →  JPA Repositories  
-├── MongoDB (dual-write)   →  MySQL only
-├── Desktop UI             →  Swagger UI + GraphQL (coming)
-└── Synchronous calls      →  HTTP REST/GraphQL APIs
-```
-
----
-
-## 🛠️ Technology Stack
-
-| Category | Technology | Version | Purpose |
-|----------|------------|---------|---------|
-| **Language** | Java (OpenJDK) | 21.0.9 | Core programming language |
-| **Framework** | Spring Boot | 3.2.2 | Application framework |
-| **Web** | Spring Web | 6.1.3 | REST API support |
-| **GraphQL** | Spring GraphQL | 16.2.0 | GraphQL API (Epic 4) |
-| **ORM** | Hibernate | 6.4.1.Final | JPA implementation |
-| **Data Access** | Spring Data JPA | 3.2.2 | Repository abstraction |
-| **Validation** | Jakarta Validation | 3.0 | DTO validation |
-| **Build Tool** | Maven | 3.8+ | Dependency management |
-| **Database** | MySQL | 8.0 | Primary relational database |
-| **Connection Pool** | HikariCP | 5.1.0 | Database connection pooling |
-| **DB Migrations** | Flyway | 9.22.3 | Schema version control |
-| **API Docs** | Springdoc OpenAPI | 2.3.0 | Swagger UI generation |
-| **Security** | jBCrypt | 0.4 | Password hashing |
-| **Lombok** | Lombok | 1.18.34 | Boilerplate reduction |
-| **Testing** | JUnit Jupiter | 5.11.4 | Unit testing |
-
-### Removed Dependencies (Lab 5 Cleanup)
-- ~~JavaFX~~ - UI layer removed
-- ~~MongoDB~~ - Simplified to MySQL-only
-- ~~Caffeine Cache~~ - Removed during architecture simplification
-- ~~ControlsFX, FormsFX, ValidatorFX~~ - Desktop UI libraries
-
----
-
-## 📖 API Documentation
-
-### Swagger UI
-Access interactive API documentation at: **http://localhost:8080/swagger-ui.html**
-
-### Available REST Endpoints
-
-#### User Management (`/api/users`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/users` | Get all users (paginated) |
-| `GET` | `/api/users/{id}` | Get user by ID |
-| `GET` | `/api/users/username/{username}` | Get user by username |
-| `GET` | `/api/users/search` | Search users by query |
-| `POST` | `/api/users` | Create new user |
-| `PUT` | `/api/users/{id}` | Update user |
-| `DELETE` | `/api/users/{id}` | Delete user |
-
-#### Post Management (`/api/posts`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/posts` | Get all posts (paginated) |
-| `GET` | `/api/posts/{id}` | Get post by ID |
-| `GET` | `/api/posts/search` | Full-text search posts |
-| `GET` | `/api/posts/author/{authorId}` | Get posts by author |
-| `GET` | `/api/posts/tag/{tagId}` | Get posts by tag |
-| `POST` | `/api/posts` | Create new post |
-| `PUT` | `/api/posts/{id}` | Update post |
-| `DELETE` | `/api/posts/{id}` | Delete post |
-
-#### Comment Management (`/api/comments`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/comments/post/{postId}` | Get comments by post |
-| `GET` | `/api/comments/user/{userId}` | Get comments by user |
-| `GET` | `/api/comments/{id}` | Get comment by ID |
-| `GET` | `/api/comments/recent` | Get recent comments |
-| `POST` | `/api/comments` | Create new comment |
-| `PUT` | `/api/comments/{id}` | Update comment |
-| `DELETE` | `/api/comments/{id}` | Delete comment |
-
-#### Tag Management (`/api/tags`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/tags` | Get all tags |
-| `GET` | `/api/tags/{id}` | Get tag by ID |
-| `GET` | `/api/tags/slug/{slug}` | Get tag by slug |
-| `GET` | `/api/tags/search` | Search tags |
-| `GET` | `/api/tags/popular` | Get popular tags |
-| `POST` | `/api/tags` | Create new tag |
-
-#### Review Management (`/api/reviews`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/reviews/post/{postId}` | Get reviews by post |
-| `GET` | `/api/reviews/user/{userId}` | Get reviews by user |
-| `GET` | `/api/reviews/{id}` | Get review by ID |
-| `GET` | `/api/reviews/post/{postId}/stats` | Get post rating statistics |
-| `POST` | `/api/reviews` | Create new review |
-| `PUT` | `/api/reviews/{id}` | Update review |
-
-### Example API Calls
-
-**Create User:**
-```bash
-curl -X POST http://localhost:8080/api/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "Prince",
-    "email": "Prince@gmail.com",
-    "password": "password123",
-    "role": "AUTHOR"
-  }'
-```
-
-**Response:**
-```json
-{
-  "status": "SUCCESS",
-  "statusCode": 201,
-  "data": {
-    "id": 7,
-    "username": "Prince",
-    "email": "Prince@gmail.com",
-    "role": "AUTHOR"
-  }
-}
-```
-
-**Create Post:**
-```bash
-curl -X POST http://localhost:8080/api/posts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Introduction to Programming",
-    "content": "Programming is the language computer understands",
-    "authorId": 7,
-    "published": false,
-    "tagIds": []
-  }'
-```
-
-**Get All Posts (Paginated):**
-```bash
-curl "http://localhost:8080/api/posts?page=0&size=10"
-```
-
-**Response:**
-```json
-{
-  "status": "SUCCESS",
-  "statusCode": 200,
-  "data": {
-    "content": [
-      {
-        "id": 74,
-        "title": "Introduction to Programming - Updated",
-        "content": "Programming is the language computer understands",
-        "authorUsername": "Prince",
-        "published": true,
-        "tags": []
-      }
-    ],
-    "pageable": {...},
-    "totalElements": 22,
-    "totalPages": 3,
-    "number": 0,
-    "size": 10
-  }
-}
-```
-
-### GraphQL API (Coming in Epic 4)
-GraphQL endpoint will be available at: **http://localhost:8080/graphql**  
-GraphiQL interface: **http://localhost:8080/graphiql**
-
----
-
-## 💾 Database Schema
-
-### Entity Relationship Diagram
-
-```
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│   USERS     │       │    POSTS    │       │    TAGS     │
-├─────────────┤       ├─────────────┤       ├─────────────┤
-│ id (PK)     │◄──────│ author_id   │       │ id (PK)     │
-│ username    │       │ id (PK)     │       │ name        │
-│ email       │       │ title       │       │ slug        │
-│ password_   │       │ content     │       └──────┬──────┘
-│   hash      │       │ published   │              │
-│ role        │       │ created_at  │              │
-│ created_at  │       │ updated_at  │              │
-│ updated_at  │       │ deleted_at  │              │
-│ deleted_at  │       └──────┬──────┘              │
-└─────────────┘              │                     │
-                             │    ┌────────────────┴────────────────┐
-                             │    │          POST_TAGS              │
-                             │    ├─────────────────────────────────┤
-                             │    │ post_id (PK, FK) ◄──────────────┤
-                             │    │ tag_id (PK, FK)                 │
-                             │    └─────────────────────────────────┘
-                             │
-                             ▼
-                    ┌─────────────┐
-                    │  COMMENTS   │
-                    ├─────────────┤
-                    │ id (PK)     │
-                    │ post_id (FK)│
-                    │ user_id (FK)│
-                    │ content     │
-                    │ created_at  │
-                    │ deleted_at  │
-                    └─────────────┘
-```
-
-### MySQL Tables
-
-#### `users`
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
-| `username` | VARCHAR(100) | NOT NULL, UNIQUE |
-| `email` | VARCHAR(255) | NOT NULL, UNIQUE |
-| `password_hash` | VARCHAR(255) | NOT NULL |
-| `role` | VARCHAR(50) | NOT NULL, DEFAULT 'AUTHOR' |
-| `created_at` | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
-| `updated_at` | DATETIME | NULL |
-| `deleted_at` | DATETIME | NULL (Soft delete) |
-
-#### `posts`
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
-| `author_id` | BIGINT | NOT NULL, FK → users(id) |
-| `title` | VARCHAR(255) | NOT NULL |
-| `content` | TEXT | NOT NULL |
-| `published` | BOOLEAN | NOT NULL, DEFAULT FALSE |
-| `created_at` | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
-| `updated_at` | DATETIME | NULL |
-| `deleted_at` | DATETIME | NULL (Soft delete) |
-
-**Indexes:** Full-text index on `(title, content)`
-
-#### `tags`
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
-| `name` | VARCHAR(100) | NOT NULL, UNIQUE |
-| `slug` | VARCHAR(120) | NOT NULL, UNIQUE |
-
-#### `post_tags` (Junction Table)
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `post_id` | BIGINT | PK, FK → posts(id) ON DELETE CASCADE |
-| `tag_id` | BIGINT | PK, FK → tags(id) ON DELETE CASCADE |
-
-#### `comments`
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
-| `post_id` | BIGINT | NOT NULL, FK → posts(id) ON DELETE CASCADE |
-| `user_id` | BIGINT | NOT NULL, FK → users(id) ON DELETE CASCADE |
-| `content` | TEXT | NOT NULL |
-| `created_at` | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
-| `deleted_at` | DATETIME | NULL (Soft delete) |
-
-#### `reviews` (Lab 5 Addition)
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
-| `post_id` | BIGINT | NOT NULL, FK → posts(id) ON DELETE CASCADE |
-| `user_id` | BIGINT | NOT NULL, FK → users(id) ON DELETE CASCADE |
-| `rating` | INT | NOT NULL, CHECK (1-5) |
-| `comment` | TEXT | NULL |
-| `created_at` | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
-
-### Database Relationships
-
-| Relationship | Type | Description |
-|--------------|------|-------------|
-| User → Posts | One-to-Many | A user can author multiple posts |
-| Post → Comments | One-to-Many | A post can have multiple comments |
-| User → Comments | One-to-Many | A user can write multiple comments |
-| Post → Reviews | One-to-Many | A post can have multiple reviews (Lab 5) |
-| User → Reviews | One-to-Many | A user can write multiple reviews (Lab 5) |
-| Post ↔ Tags | Many-to-Many | Posts and tags are linked via `post_tags` |
-
-### Flyway Migrations (Lab 5)
-- **V1__init.sql** - Initial schema creation
-- **V2__performance_indexes.sql** - Added performance indexes
-- **V3__fulltext_search_index.sql** - Full-text search on posts (title, content)
-
----
-
-## 🚀 Getting Started
+## 4. Getting Started
 
 ### Prerequisites
 
-- **Java 21** (OpenJDK 21.0.9 recommended)
-- **Maven 3.8+**
-- **MySQL 8.x** running on `localhost:3306`
+- Java 21
+- Maven 3.8+
+- MySQL 8 running on localhost
 
-### Installation
+### Run locally
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/SmartBloggingPlatform.git
-   cd SmartBloggingPlatform
-   ```
+1. Create database:
 
-2. **Create the MySQL database**
-   ```sql
-   CREATE DATABASE smart_blog;
-   ```
-
-3. **Configure database credentials**
-   Edit `src/main/resources/application-local.properties`:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/smart_blog
-   spring.datasource.username=root
-   spring.datasource.password=your_password
-   ```
-
-4. **Build the project**
-   ```bash
-   ./mvnw clean install
-   ```
-
-5. **Run the application**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-   Or using Maven wrapper:
-   ```bash
-   mvnw.cmd spring-boot:run  # Windows
-   ./mvnw spring-boot:run     # Linux/Mac
-   ```
-
-6. **Access the API**
-   - Swagger UI: http://localhost:8080/swagger-ui.html
-   - REST API Base: http://localhost:8080/api
-   - GraphiQL (Epic 4): http://localhost:8080/graphiql (coming soon)
-
-### Quick Test via Swagger
-
-1. Navigate to http://localhost:8080/swagger-ui.html
-2. Try the **POST /api/users** endpoint:
-   ```json
-   {
-     "username": "testuser",
-     "email": "test@example.com",
-     "password": "password123",
-     "role": "AUTHOR"
-   }
-   ```
-3. Test **GET /api/posts** to see existing blog posts
-4. Explore other endpoints using the interactive documentation
-
----
-
-## ⚙️ Configuration
-
-Configuration is managed via profile-based properties files:
-
-### `application.properties` (Global)
-```properties
-# Application Settings
-spring.application.name=SmartBloggingPlatform
-server.port=8080
-
-# Active Profile
-spring.profiles.active=local
-
-# JPA Configuration
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+```sql
+CREATE DATABASE smart_blog;
 ```
 
-### `application-local.properties` (Development)
-```properties
-# MySQL Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/smart_blog?useSSL=false&serverTimezone=UTC
-spring.datasource.username=root
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+2. Create local secrets file (`.env`) in project root:
 
-# HikariCP Connection Pool
-spring.datasource.hikari.maximum-pool-size=15
-spring.datasource.hikari.minimum-idle=2
-spring.datasource.hikari.idle-timeout=600000
-spring.datasource.hikari.max-lifetime=1800000
+```env
+DB_URL=jdbc:mysql://localhost:3306/smart_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USER=root
+DB_PASS=your_mysql_password
 
-# JPA/Hibernate
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
-spring.jpa.properties.hibernate.jdbc.batch_size=20
-
-# Flyway Migrations
-spring.flyway.enabled=true
-spring.flyway.locations=classpath:db/migration
-spring.flyway.validate-on-migrate=false
-
-# Swagger/OpenAPI
-springdoc.api-docs.path=/api-docs
-springdoc.swagger-ui.path=/swagger-ui.html
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
-### Configuration Options
+3. Build and run:
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| `server.port` | HTTP server port | 8080 |
-| `spring.datasource.hikari.maximum-pool-size` | Max DB connections | 15 |
-| `spring.jpa.show-sql` | Log SQL queries | true (dev) |
-| `spring.flyway.enabled` | Run migrations on startup | true |
-| `spring.flyway.validate-on-migrate` | Validate migration checksums | false (dev) |
+```bash
+./mvnw clean install
+./mvnw spring-boot:run
+```
 
----
-
-## Local .env Workflow
-
-For local development store sensitive credentials in a local `.env` file (NOT committed). A template is provided as `.env.example`.
-
-- Copy the template and edit your secrets:
+Windows:
 
 ```powershell
-Copy-Item .\.env.example .\.env
-notepad .\.env
+.\mvnw.cmd clean install
+.\mvnw.cmd spring-boot:run
 ```
 
-- Load the `.env` values into the current PowerShell session before running the app (process scope only):
+4. Verify app:
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- GraphQL endpoint: `http://localhost:8080/graphql`
+- GraphiQL: `http://localhost:8080/graphiql`
 
-```powershell
-Get-Content .\.env |
-  Where-Object { $_ -and -not ($_ -match '^\s*#') } |
-  ForEach-Object { $kv = $_ -split '=',2; [System.Environment]::SetEnvironmentVariable($kv[0].Trim(), $kv[1].Trim(), 'Process') }
+## 5. Configuration
 
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+Active profile defaults to `local`.
+
+`application-local.properties` imports root `.env`:
+
+```properties
+spring.config.import=optional:file:.env[.properties],optional:file:./config/application-local-secrets.properties
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/smart_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+spring.datasource.username=${DB_USER:${DB_USERNAME:root}}
+spring.datasource.password=${DB_PASS:${DB_PASSWORD:}}
 ```
 
-Notes:
-- Do NOT commit `.env` to source control. `.gitignore` already excludes it.
-- `application-local.properties` reads `DB_URL`, `DB_USER`, and `DB_PASS` from the environment when the `local` profile is used.
+Security-related configuration highlights:
+- Stateless session policy for APIs
+- CORS allowed origins for local clients
+- CSRF enabled for browser form demonstration routes
+- CSRF ignored for JWT API routes (`/auth/**` etc.)
+- OAuth2 Google client registration via environment variables
 
+## 6. API Documentation
 
-## 📁 Project Structure
+### Primary endpoint groups
 
-```
-SmartBloggingPlatform/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── module-info.java (deprecated - to be removed)
-│   │   │   └── com/smartblog/
-│   │   │       ├── SmartBlogApplication.java   # Spring Boot entry point
-│   │   │       ├── application/
-│   │   │       │   ├── security/               # Security context (legacy)
-│   │   │       │   ├── service/                # Business logic services
-│   │   │       │   │   ├── UserService.java
-│   │   │       │   │   ├── PostService.java
-│   │   │       │   │   ├── CommentService.java
-│   │   │       │   │   ├── TagService.java
-│   │   │       │   │   └── ReviewService.java
-│   │   │       │   └── util/                   # Utilities
-│   │   │       ├── core/
-│   │   │       │   ├── dto/                    # Data Transfer Objects
-│   │   │       │   │   ├── UserDTO.java
-│   │   │       │   │   ├── PostDTO.java
-│   │   │       │   │   ├── CommentDTO.java
-│   │   │       │   │   ├── TagDTO.java
-│   │   │       │   │   └── ReviewDTO.java
-│   │   │       │   ├── exceptions/             # Custom exceptions
-│   │   │       │   └── model/                  # JPA Entities
-│   │   │       │       ├── User.java
-│   │   │       │       ├── Post.java
-│   │   │       │       ├── Comment.java
-│   │   │       │       ├── Tag.java
-│   │   │       │       └── Review.java
-│   │   │       ├── infrastructure/
-│   │   │       │   ├── datasource/             # Data source config
-│   │   │       │   ├── migration/              # Flyway migrations
-│   │   │       │   └── repository/             # Spring Data JPA
-│   │   │       │       ├── jpa/
-│   │   │       │       │   ├── UserJpaRepository.java
-│   │   │       │       │   ├── PostJpaRepository.java
-│   │   │       │       │   ├── CommentJpaRepository.java
-│   │   │       │       │   ├── TagJpaRepository.java
-│   │   │       │       │   └── ReviewJpaRepository.java
-│   │   │       └── ui/
-│   │   │           └── controller/             # REST Controllers
-│   │   │               ├── UserController.java
-│   │   │               ├── PostController.java
-│   │   │               ├── CommentController.java
-│   │   │               ├── TagController.java
-│   │   │               └── ReviewController.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       ├── application-local.properties
-│   │       └── db/migration/
-│   │           ├── V1__init.sql
-│   │           ├── V2__performance_indexes.sql
-│   │           └── V3__fulltext_search_index.sql
-│   └── test/
-│       └── java/                               # Unit tests
-├── target/                                     # Compiled output
-├── pom.xml                                     # Maven dependencies
-├── mvnw / mvnw.cmd                             # Maven wrapper
-└── README.md
-```
+- Auth: `/auth/*`
+- Security test endpoints: `/protected/*`
+- CSRF form demo: `/form/*`
+- Monitoring report: `/admin/security-report`
+- Core business APIs: `/api/users`, `/api/posts`, `/api/comments`, `/api/tags`, `/api/reviews`
 
-### Key Directories (Lab 5)
+### Security and auth endpoints
 
-| Directory | Purpose |
-|-----------|---------|
-| `ui/controller/` | REST API endpoints (`@RestController`) |
-| `application/service/` | Business logic layer |
-| `infrastructure/repository/jpa/` | Spring Data JPA repositories |
-| `core/model/` | JPA entities (`@Entity`) |
-| `core/dto/` | Data Transfer Objects (Java Records) |
-| `resources/db/migration/` | Flyway SQL migration scripts |
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/refresh`
+- `POST /auth/revoke`
+- `POST /auth/logout`
+- OAuth start: `GET /oauth2/authorization/google`
 
-### Removed Directories (Lab 5 Cleanup)
-- ❌ `ui/view/` - JavaFX FXML views
-- ❌ `ui/components/` - JavaFX UI components
-- ❌ `ui/themes/` - CSS theme files
-- ❌ `infrastructure/repository/jdbc/` - Legacy JDBC repositories
-- ❌ `infrastructure/nosql/` - MongoDB client factory
-- ❌ `infrastructure/caching/` - Caffeine cache manager
-- ❌ `core/mapper/` - Manual entity-DTO mappers
-- ❌ `bootstrap/` - Dependency injection (replaced by Spring)
+### RBAC test endpoints
 
----
+- `GET /protected/admin-test` (`ADMIN`)
+- `GET /protected/author-test` (`AUTHOR` or `ADMIN`)
+- `GET /protected/reader-test` (`READER`, `AUTHOR`, or `ADMIN`)
 
-## Performance & Caching (Module 6)
+## 7. Data Model Summary
 
- - **Overview:** Module 6 adds service-layer caching (Caffeine via Spring Cache) for common read paths (`postView`, `postsByAuthor`, `userById`, `userByUsername`) and includes integration tests and benchmarks.
- - **Run caching integration tests:**
-   - `mvn -Dspring.profiles.active=test -Dtest=com.smartblog.cache.CachingIntegrationTest test`
- - **Run eviction & paged benchmark:**
-   - `mvn -Dspring.profiles.active=test -Dtest=com.smartblog.cache.EvictionAndPagedBenchmarkTest test`
- - **Performance report template:** See `performance_report_module6.md` for commands and EXPLAIN guidance to run against MySQL/staging.
+Primary entities:
+- `User`
+- `Post`
+- `Comment`
+- `Tag`
+- `Review`
 
-### Swagger UI Testing (Lab 5)
-Interactive API testing via Swagger UI at http://localhost:8080/swagger-ui.html
+Relationships:
+- User -> Posts (1:N)
+- User -> Comments (1:N)
+- User -> Reviews (1:N)
+- Post -> Comments (1:N)
+- Post -> Reviews (1:N)
+- Post <-> Tags (N:N)
 
-**Tested Scenarios:**
-1. ✅ Create User (POST /api/users) - Created user "Prince" with id=7
-2. ✅ Create Post (POST /api/posts) - Created post id=74 "Introduction to Programming"
-3. ✅ Update Post (PUT /api/posts/74) - Updated title and published status
-4. ✅ Get All Posts (GET /api/posts) - Retrieved 22 published posts with pagination
-5. ✅ Search Posts (GET /api/posts/search) - Full-text search working
+Migrations managed with Flyway under `src/main/resources/db/migration`.
 
-### Manual API Testing with cURL
+## 8. Testing Guide
 
-**Create User:**
-```bash
-curl -X POST http://localhost:8080/api/users \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","email":"test@example.com","password":"pass123","role":"AUTHOR"}'
-```
+### Automated tests
 
-**Get All Posts:**
-```bash
-curl "http://localhost:8080/api/posts?page=0&size=10"
-```
+Run all tests:
 
-**Search Posts:**
-```bash
-curl "http://localhost:8080/api/posts/search?query=programming&page=0&size=10"
-```
-
-### Unit Testing
-JUnit 5 tests are located in `src/test/java/`. Run with:
 ```bash
 ./mvnw test
 ```
 
-### Security Testing (Epic 3): CORS vs CSRF
+Security-focused tests include:
+- `ProtectedControllerRBACTest`
+- `FormCsrfIntegrationTest`
+- `OAuth2UserServiceImplTest`
+- `OAuth2AuthenticationSuccessHandlerTest`
+- `SecurityReportControllerTest`
 
-#### CORS vs CSRF (Practical)
-- **CORS** controls which browser origins can call your API. It is enforced by the browser and configured by response headers.
-- **CSRF** protects cookie-based authenticated flows from forged state-changing requests.
-- In this project:
-  - JWT/API routes are stateless and CSRF checks are ignored for those API paths.
-  - Browser form demo routes are CSRF-protected and require a valid CSRF token.
+### Postman testing
 
-#### Browser CSRF Demo
-1. Open `http://localhost:8080/form/csrf`.
-2. Submit the rendered form.
-3. Expected: `201 Created` with response body starting with `received:`.
-4. Inspect cookies and confirm `XSRF-TOKEN` is issued for the CSRF-protected flow.
+Use `DEMONSTRATION_GUIDE.md` for complete step-by-step verification with expected responses.
 
-#### Postman CSRF Demo
-1. `GET /form/csrf` and copy hidden token value (`_csrf`) from HTML response.
-2. `POST /form/submit` with form-data:
-   - `message=hello`
-   - `_csrf=<token from step 1>`
-3. Expected: `201 Created`.
-4. Retry `POST /form/submit` without `_csrf`.
-5. Expected: `403 Forbidden`.
+High-level order:
+1. Register/login
+2. RBAC endpoint checks
+3. Refresh token rotation checks
+4. CSRF browser/form checks
+5. OAuth2 login flow
+6. Security report retrieval
 
-#### Postman CORS Preflight Simulation
-1. `OPTIONS /auth/login` with headers:
+## 9. Performance Notes
+
+- HikariCP connection pooling configured
+- Full-text and supporting indexes applied via Flyway
+- Pagination supported on list endpoints
+- Optional Redis revocation store for distributed deployments
+
+## 10. Module 7 Security Enhancement Report (Epic 1-5)
+
+This section is structured to match Module 7 requirements and deliverables.
+
+### 10.1 Requirement Objectives Coverage
+
+From Module 7 objectives, this project implements:
+- Spring Security configuration for authentication and authorization
+- JWT-based authentication and token validation
+- Google OAuth2 login integration
+- BCrypt password hashing
+- CORS and CSRF strategy (Postman + browser workflow)
+- RBAC enforcement with role-scoped access
+- DSA-oriented security optimization (hashing, concurrent maps, counters)
+- Security event logging and report endpoint
+
+### 10.2 Epic Implementation Summary
+
+| Epic | Requirement Focus | Implementation Status | Key Evidence |
+|---|---|---|---|
+| Epic 1 | SecurityFilterChain, CORS, BCrypt | COMPLETE | `SecurityConfig`, CORS policy, password encoder bean |
+| Epic 2 | JWT login/validation/claims | COMPLETE | `/auth/login`, `JwtService`, `JwtAuthenticationFilter`, revoke/logout/refresh |
+| Epic 3 | CSRF strategy + CORS/CSRF understanding | COMPLETE | `/form/csrf`, `/form/submit`, CSRF ignored for stateless JWT routes |
+| Epic 4 | Google OAuth2 + RBAC | COMPLETE | OAuth2 login wiring, local user mapping, role assignment, `@PreAuthorize` |
+| Epic 5 | DSA security optimization + monitoring | COMPLETE | revocation map/Redis option, security metrics service, `/admin/security-report` |
+
+### 10.3 Epic 1 - Security Configuration and Access Policies
+
+Implemented:
+- Custom `SecurityFilterChain`
+- Public route allowances for auth/docs/form demo
+- Restricted route policies by role
+- BCrypt encoder for password hashing
+- Global CORS policy with controlled origins/methods/headers
+
+Requirement alignment:
+- Public and restricted endpoints explicitly defined
+- Unauthorized/disallowed access returns correct codes (`401`/`403`)
+
+### 10.4 Epic 2 - JWT-Based Authentication
+
+Implemented:
+- `POST /auth/login` returns JWT access token + refresh token
+- JWT contains identity and expiration claims; signed using HS256
+- Per-request JWT validation via filter
+- Tampered/expired/revoked token rejection path
+- Token revoke/logout endpoints
+- Refresh token rotation endpoint
+
+Requirement alignment:
+- Signed token issuance and validation operational
+- Token structure verifiable in Postman
+
+### 10.5 Epic 3 - CSRF and Session Security
+
+Implemented:
+- Stateless JWT APIs with CSRF ignored for API routes
+- CSRF token demonstration endpoint for browser/form scenario:
+  - `GET /form/csrf`
+  - `POST /form/submit`
+
+Requirement alignment:
+- Practical CORS vs CSRF behavior documented and testable
+- Demonstrates correct threat-model split between API and cookie/form flows
+
+#### 10.5.1 CORS vs CSRF Technical Explanation (Required Documentation)
+
+- CORS (Cross-Origin Resource Sharing) controls which browser origins are allowed to call the backend. It is a browser enforcement mechanism based on response headers.
+- CSRF (Cross-Site Request Forgery) protects state-changing requests in cookie/session-based authentication flows from forged cross-site submissions.
+- Why CSRF is different for JWT APIs:
+  - In this project, JWT is sent in `Authorization: Bearer ...`, and APIs are stateless.
+  - Since authentication is not based on automatically attached session cookies, CSRF protection is not required for those JWT API routes.
+- Why CSRF is enabled for form/stateful scenarios:
+  - Browser form submissions and session-style flows are vulnerable to CSRF because browsers auto-send cookies.
+  - Therefore CSRF token validation is enabled and demonstrated on `/form/*`.
+
+#### 10.5.2 Practical Browser-Based CSRF Demonstration
+
+1. Open `http://localhost:8080/form/csrf` in a browser.
+2. Confirm the returned HTML form includes a hidden `_csrf` field.
+3. Submit the form.
+4. Expected result: `201 Created` and response body like `received:<message>`.
+5. Browser should hold `XSRF-TOKEN` cookie for this CSRF-protected flow.
+
+What this proves:
+- CSRF token mechanism is active for form-based state-changing requests.
+
+#### 10.5.3 Practical Postman Tests (CORS + CSRF)
+
+CSRF negative test:
+1. Send `POST http://localhost:8080/form/submit` without CSRF token.
+2. Expected result: `403 Forbidden`.
+
+CSRF positive test:
+1. Send `GET http://localhost:8080/form/csrf`.
+2. Copy `_csrf` token value from HTML response and keep returned cookie.
+3. Send `POST http://localhost:8080/form/submit` with `x-www-form-urlencoded` body:
+   - `_csrf=<copied_token>`
+   - `message=epic3-pass`
+4. Expected result: `201 Created`.
+
+CORS preflight simulation:
+1. Send `OPTIONS http://localhost:8080/auth/login` with headers:
    - `Origin: http://localhost:3000`
    - `Access-Control-Request-Method: POST`
-   Expected: allowed preflight.
-2. Repeat with:
-   - `Origin: http://evil.example.com`
-   Expected: rejected preflight (`403`).
+2. Expected result: allowed preflight.
+3. Repeat with `Origin: http://evil.example.com`.
+4. Expected result: rejected preflight (`403`).
 
----
+### 10.6 Epic 4 - OAuth2 and RBAC
 
-## 🔧 Known Issues & Future Work
+Implemented:
+- Google OAuth2 client integration through Spring Security OAuth2
+- OAuth2 user mapping to local user model and persistence
+- Default role assignment for first-time OAuth users
+- JWT + refresh token issuance on OAuth success
+- Method-level RBAC enforcement using `@PreAuthorize`
 
-### Current Blockers (Lab 5)
-- ⚠️ **pom.xml Syntax Error**: GraphQL dependency blocked by XML syntax issues (// comments, misplaced tags)
-- 🔜 **Epic 4 Incomplete**: GraphQL schema and controllers not yet implemented
+Requirement alignment:
+- Google login integrated with persistence and role mapping
+- Role-based access validated through endpoint behavior
 
-### Deprecated Code to Remove
-- ⚠️ `module-info.java` - No longer needed for Spring Boot non-modular builds
-- ⚠️ Legacy security context classes (to be replaced with Spring Security)
-- ⚠️ Old performance report text files in workspace root
+### 10.7 Epic 5 - DSA and Security Optimization
 
-### Future Enhancements
-- 🔐 Spring Security integration (JWT authentication)
-- 📧 Email notifications for comments
-- 🖼️ Image upload for post content
-- 📊 Analytics dashboard (REST endpoints for metrics)
-- 🔔 GraphQL subscriptions for real-time updates
-- 🐳 Docker containerization
-- ☁️ Azure deployment configuration
-
----
-
-## 📈 Performance Notes
-
-### Database Optimizations (Lab 5)
-- ✅ HikariCP connection pool (15 max connections)
-- ✅ Full-text indexes on posts (title, content)
-- ✅ Composite indexes on post_tags (V2 migration)
-- ✅ Batch inserts enabled (batch_size=20)
-- ✅ Transaction isolation: READ_COMMITTED
-
-### Known Performance Considerations
-- Full-text search requires MySQL InnoDB full-text indexes (enabled in V3 migration)
-- Lazy loading relationships require `@Transactional` to prevent N+1 queries
-- Pagination recommended for large result sets (default size=10)
-
----
-
-## 🎨 UI Screenshots (Deprecated - JavaFX Removed in Lab 5)
-
-### Modern Dark Theme
-The original desktop application featured a sleek dark theme with:
-- **Dark backgrounds**: `#12151a`, `#1a1d23`, `#1e222a`
-- **High-contrast text**: White (`#ffffff`) and light gray (`#e2e8f0`)
-- **Vibrant accent gradients**:
-  - Author Dashboard: Indigo → Purple (`#6366f1` → `#8b5cf6` → `#a855f7`)
-  - Admin Dashboard: Pink → Rose → Orange (`#ec4899` → `#f43f5e` → `#f97316`)
-- **Modern cards with subtle shadows and borders**
-
-### Key Views
-- **Login View** - Split-panel design with gradient accents
-- **Author Dashboard** - Post management, stats, and quick actions
-- **Admin Dashboard** - User management, drafts approval, system stats
-- **Post Editor** - Rich text editing with tag assignment
-- **Performance Report** - Benchmark results with color-coded metrics
-
-**Note**: All JavaFX UI code has been removed in Lab 5 in favor of REST/GraphQL APIs with Swagger UI.
-
----
-
-## 🔄 MongoDB Migration (Deprecated)
-
-MongoDB dual-write functionality was removed in Lab 5 for architecture simplification. The project now uses MySQL-only persistence.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👨‍💻 Author
-
-**Andy Kwasi Debrah**
-
----
-
-<p align="center">
-  Built with ❤️ using Java, Spring Boot, and REST/GraphQL APIs
-</p>
-## Epic 5 Security Monitoring
-
-The platform includes in-memory security telemetry for authentication and authorization events.
-
-- Structured events are logged with `security_event=...` markers for:
-  - login attempts/success/failure
-  - OAuth2 login success
-  - token validation success/failure
-  - refresh success/failure
-  - token revocation
-  - unauthorized/access denied
-- Admin-only report endpoint:
+Implemented:
+- BCrypt hashing for passwords
+- Revocation store using `ConcurrentHashMap` (in-memory)
+- Optional Redis-backed revocation for production-like deployments
+- Scheduled cleanup of expired revocation entries
+- `SecurityEventMetricsService` with:
+  - `AtomicLong` counters
+  - per-principal failure map
+  - suspicious principal thresholding
+- Admin-only security report endpoint:
   - `GET /admin/security-report`
-  - Requires `ROLE_ADMIN`
-  - Returns counters, failed-logins-by-principal, and `suspiciousPrincipals` (failure count >= threshold)
 
-### Quick Test (Postman)
+Requirement alignment:
+- Hashing + map-based lookup structures applied
+- Authentication monitoring and access-pattern visibility provided
 
-1. Login as admin to obtain JWT.
-2. Call `GET /admin/security-report` with `Authorization: Bearer <admin_token>`.
-3. Verify response includes:
-   - `loginAttempts`
-   - `loginFailures`
-   - `tokenValidationFailures`
-   - `loginFailuresByPrincipal`
-   - `suspiciousPrincipals`
+### 10.8 Module 7 Deliverables Mapping
+
+| Deliverable (Module 7) | Project Implementation |
+|---|---|
+| Spring Security Integration | Configured filter chain and access rules |
+| JWT Authentication System | Login, validation filter, refresh, revoke, logout |
+| CORS & CSRF Configuration | CORS policy + CSRF strategy and demonstration routes |
+| OAuth2 (Google Login) | OAuth2 client flow, user persistence, role mapping |
+| RBAC Enforcement | Role-guarded endpoints + method security |
+| Security Event Logging | Structured security event logs and counters |
+| DSA Implementation | Concurrent maps, hashing, token validation logic |
+| README & OpenAPI Docs | This README + Swagger/OpenAPI endpoints |
+
+### 10.9 Evaluation Readiness (Panel Demonstration)
+
+Module 7 evaluation categories are covered through implementation and repeatable testing:
+- Security configuration (CORS/CSRF)
+- JWT implementation
+- OAuth2 integration
+- RBAC
+- DSA application in security logic
+- Testing and logging evidence
+- Documentation quality
+
+
+
+---
+
+Author: Andy Kwasi Debrah
