@@ -1,0 +1,108 @@
+{
+  "info": {
+    "_postman_id": "smartblog-collection",
+    "name": "SmartBloggingPlatform - Auth & RBAC",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login (devadmin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"devadmin\",\n  \"password\": \"Password123!\"\n}" },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status is 200', function(){ pm.response.to.have.status(200); });",
+              "var json = pm.response.json();",
+              "if(json.token) pm.environment.set('accessToken', json.token);",
+              "if(json.refreshToken) pm.environment.set('refreshToken', json.refreshToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register (optional)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"Secret123!\",\n  \"role\": \"AUTHOR\"\n}" },
+        "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] }
+      },
+      "event": [ { "listen": "test", "script": { "exec": [ "pm.test('created', function(){ pm.response.to.have.status(201); });" ] } } ]
+    },
+    {
+      "name": "Protected - Admin Test",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "{{baseUrl}}/protected/admin-test", "host": ["{{baseUrl}}"], "path": ["protected","admin-test"] }
+      },
+      "event": [ { "listen": "test", "script": { "exec": [ "pm.test('status 200 or 401/403', function(){ pm.expect([200,401,403]).to.include(pm.response.code); });" ] } } ]
+    },
+    {
+      "name": "Protected - Author Test",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "{{baseUrl}}/protected/author-test", "host": ["{{baseUrl}}"], "path": ["protected","author-test"] }
+      }
+    },
+    {
+      "name": "Protected - Reader Test",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "{{baseUrl}}/protected/reader-test", "host": ["{{baseUrl}}"], "path": ["protected","reader-test"] }
+      }
+    },
+    {
+      "name": "Refresh Token (rotate)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"password\": \"{{refreshToken}}\"\n}" },
+        "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth","refresh"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status is 200', function(){ pm.response.to.have.status(200); });",
+              "var json = pm.response.json();",
+              "if(json.token) pm.environment.set('accessToken', json.token);",
+              "if(json.refreshToken) pm.environment.set('refreshToken', json.refreshToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Revoke Token",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "body": { "mode": "raw", "raw": "{ }" },
+        "url": { "raw": "{{baseUrl}}/auth/revoke", "host": ["{{baseUrl}}"], "path": ["auth","revoke"] }
+      },
+      "event": [ { "listen": "test", "script": { "exec": [ "pm.test('status 200', function(){ pm.response.to.have.status(200); });" ] } } ]
+    },
+    {
+      "name": "Logout (revoke current)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+        "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth","logout"] }
+      }
+    }
+  ]
+}
