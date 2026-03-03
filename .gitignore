@@ -1,3 +1,15 @@
+# Compiled class files and build output
+target/
+
+# IDE files
+.idea/
+.vscode/
+
+# Local environment variables (do NOT commit .env with secrets)
+.env
+
+# Logs
+*.log
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
