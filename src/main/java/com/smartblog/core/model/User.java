@@ -48,7 +48,7 @@ public class User {
     @Column(name = "bio", length = 500)
     private String bio;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = com.smartblog.core.convert.UserRoleConverter.class)
     @Column(name = "role", nullable = false, length = 20)
     @Builder.Default
     private UserRole role = UserRole.READER;

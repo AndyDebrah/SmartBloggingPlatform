@@ -325,6 +325,20 @@
                     </excludes>
                 </configuration>
             </plugin>
+            
+            <!-- Flyway Maven Plugin: ensure plugin has access to JDBC driver -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>9.22.3</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mysql</groupId>
+                        <artifactId>mysql-connector-j</artifactId>
+                        <version>8.0.33</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
     

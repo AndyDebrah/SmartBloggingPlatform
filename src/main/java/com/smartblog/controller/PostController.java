@@ -3,6 +3,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -178,6 +179,7 @@ public class PostController {
      * Update an existing post.
      */
     @PutMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN') or @postSecurity.isOwner(#id)")
     @Operation(summary = "Update post", description = "Update an existing post")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Post updated successfully",
@@ -217,6 +219,7 @@ public class PostController {
      * Soft delete a post.
      */
     @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN') or @postSecurity.isOwner(#id)")
     @Operation(summary = "Delete post", description = "Soft delete a post")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Post deleted successfully"),

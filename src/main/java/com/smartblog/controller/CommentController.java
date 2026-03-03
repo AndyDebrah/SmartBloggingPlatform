@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,6 +107,7 @@ public class CommentController {
      * Update an existing comment.
      */
     @PutMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN') or @commentSecurity.isOwner(#id)")
     @Operation(summary = "Update comment", description = "Update an existing comment")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Comment updated successfully",
@@ -136,6 +138,7 @@ public class CommentController {
      * Soft delete a comment.
      */
     @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN') or @commentSecurity.isOwner(#id)")
     @Operation(summary = "Delete comment", description = "Soft delete a comment")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Comment deleted successfully"),

@@ -2,8 +2,12 @@ package com.smartblog.core.dto.request;
 
 import com.smartblog.application.validation.UniqueEmail;
 import com.smartblog.application.validation.UniqueUsername;
+
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for creating a new user.
@@ -53,7 +57,7 @@ public record UserCreateRequest(
                 allowableValues = {"ADMIN", "AUTHOR", "READER"},
                 defaultValue = "READER"
         )
-        @Pattern(regexp = "^(ADMIN|AUTHOR|READER)$", message = "Role must be ADMIN, AUTHOR, or READER")
+        @Pattern(regexp = "^(ADMIN|AUTHOR|READER)$", flags = {jakarta.validation.constraints.Pattern.Flag.CASE_INSENSITIVE}, message = "Role must be ADMIN, AUTHOR, or READER")
         String role
 ) {}
 

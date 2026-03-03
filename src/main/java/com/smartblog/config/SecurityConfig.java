@@ -2,6 +2,7 @@ package com.smartblog.config;
 
 import java.util.List;
 
+import org.springframework.beans.BeansException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.ObjectProvider;
@@ -44,7 +45,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    OAuth2UserServiceImpl oauth2UserService,
                                                    OAuth2AuthenticationSuccessHandler oauth2SuccessHandler,
-                                                   ObjectProvider<ClientRegistrationRepository> clientRegistrationRepository) throws Exception {
+                                                   ObjectProvider<ClientRegistrationRepository> clientRegistrationRepository) throws Exception, BeansException {
         http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf
