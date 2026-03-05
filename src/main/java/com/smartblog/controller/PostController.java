@@ -1,8 +1,12 @@
 package com.smartblog.controller;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.micrometer.core.annotation.Timed;
 
 /**
  * REST API endpoints for Post management.
@@ -43,28 +48,34 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Post Management", description = "APIs for managing blog posts")
 public class PostController {
     private final PostService postService;
+    @Qualifier("epic2TaskExecutor")
+    private final Executor epic2TaskExecutor;
+    private final Environment environment;
 
     /**
      * Get all posts with pagination.
      */
-    @GetMapping
+        @GetMapping
+        @Timed("posts.getAll")
     @Operation(summary = "Get all posts", description = "Retrieve paginated list of posts")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Posts retrieved successfully",
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ApiResponse<List<PostDTO>>> getAllPosts(
+    public CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> getAllPosts(
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/posts - page={}, size={}", page, size);
-        var posts = postService.list(page, size);
-        return ResponseEntity.ok(
-                ApiResponse.success("Posts retrieved successfully", posts.getContent(), PaginationMetadata.from(posts))
-        );
+        return runAsync(() -> {
+            var posts = postService.list(page, size);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Posts retrieved successfully", posts.getContent(), PaginationMetadata.from(posts))
+            );
+        });
     }
 
     /**
@@ -78,7 +89,8 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid search query"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ApiResponse<List<PostDTO>>> searchPosts(
+        @Timed("posts.search")
+        public CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> searchPosts(
             @Parameter(description = "Search keyword(s)", required = true)
             @RequestParam String q,
             @Parameter(description = "Page number (0-based)")
@@ -87,10 +99,12 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/posts/search?q={}", q);
-        var posts = postService.search(q, page, size);
-        return ResponseEntity.ok(
-                ApiResponse.success("Search results for: " + q, posts.getContent(), PaginationMetadata.from(posts))
-        );
+        return runAsync(() -> {
+            var posts = postService.search(q, page, size);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Search results for: " + q, posts.getContent(), PaginationMetadata.from(posts))
+            );
+        });
     }
 
     /**
@@ -128,7 +142,8 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Author not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ApiResponse<List<PostDTO>>> getPostsByAuthor(
+        @Timed("posts.byAuthor")
+        public CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> getPostsByAuthor(
             @Parameter(description = "Author ID")
             @PathVariable Long authorId,
             @Parameter(description = "Page number (0-based)")
@@ -137,10 +152,12 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/posts/author/{}", authorId);
-        var posts = postService.listByAuthor(authorId, page, size);
-        return ResponseEntity.ok(
-                ApiResponse.success("Posts by author retrieved", posts.getContent(), PaginationMetadata.from(posts))
-        );
+        return runAsync(() -> {
+            var posts = postService.listByAuthor(authorId, page, size);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Posts by author retrieved", posts.getContent(), PaginationMetadata.from(posts))
+            );
+        });
     }
 
 
@@ -241,5 +258,17 @@ public class PostController {
         return ResponseEntity.ok(
                 ApiResponse.<Void>success("Post deleted successfully")
         );
+    }
+
+    private boolean isAsyncEnabled() {
+        return environment.getProperty("app.async.enabled", Boolean.class, Boolean.TRUE);
+    }
+
+    private CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> runAsync(
+            java.util.function.Supplier<ResponseEntity<ApiResponse<List<PostDTO>>>> supplier) {
+        if (!isAsyncEnabled()) {
+            return CompletableFuture.completedFuture(supplier.get());
+        }
+        return CompletableFuture.supplyAsync(supplier, epic2TaskExecutor);
     }
 }

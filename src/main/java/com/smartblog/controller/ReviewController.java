@@ -12,12 +12,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -26,6 +31,9 @@ import java.util.Map;
 @Tag(name = "Review Management", description = "APIs for managing post reviews and ratings")
 public class ReviewController {
         private final ReviewService reviewService;
+        @Qualifier("epic2TaskExecutor")
+        private final Executor epic2TaskExecutor;
+        private final Environment environment;
 
         @GetMapping("/post/{postId}")
         @Operation(summary = "Get reviews by post", description = "Retrieve all reviews for a specific post")
@@ -34,20 +42,22 @@ public class ReviewController {
                         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Post not found", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
                         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
         })
-        public ResponseEntity<ApiResponse<List<ReviewDTO>>> getReviewsByPost(
+        public CompletableFuture<ResponseEntity<ApiResponse<List<ReviewDTO>>>> getReviewsByPost(
                         @PathVariable Long postId,
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "20") int size) {
                 log.info("GET /api/reviews/post/{}", postId);
-                try {
-                        Page<ReviewDTO> reviewPage = reviewService.getReviewsByPost(postId, page, size);
-                        return ResponseEntity.ok(
-                                        ApiResponse.success("Reviews retrieved successfully", reviewPage.getContent(),
-                                                        PaginationMetadata.from(reviewPage)));
-                } catch (NotFoundException e) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                        .body(ApiResponse.notFound(e.getMessage()));
-                }
+                return runAsync(() -> {
+                        try {
+                                Page<ReviewDTO> reviewPage = reviewService.getReviewsByPost(postId, page, size);
+                                return ResponseEntity.ok(
+                                                ApiResponse.success("Reviews retrieved successfully", reviewPage.getContent(),
+                                                                PaginationMetadata.from(reviewPage)));
+                        } catch (NotFoundException e) {
+                                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                                .body(ApiResponse.notFound(e.getMessage()));
+                        }
+                });
         }
 
         @GetMapping("/user/{userId}")
@@ -57,20 +67,22 @@ public class ReviewController {
                         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
                         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
         })
-        public ResponseEntity<ApiResponse<List<ReviewDTO>>> getReviewsByUser(
+        public CompletableFuture<ResponseEntity<ApiResponse<List<ReviewDTO>>>> getReviewsByUser(
                         @PathVariable Long userId,
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "20") int size) {
                 log.info("GET /api/reviews/user/{}", userId);
-                try {
-                        Page<ReviewDTO> reviewPage = reviewService.getReviewsByUser(userId, page, size);
-                        return ResponseEntity.ok(
-                                        ApiResponse.success("Reviews retrieved successfully", reviewPage.getContent(),
-                                                        PaginationMetadata.from(reviewPage)));
-                } catch (NotFoundException e) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                        .body(ApiResponse.notFound(e.getMessage()));
-                }
+                return runAsync(() -> {
+                        try {
+                                Page<ReviewDTO> reviewPage = reviewService.getReviewsByUser(userId, page, size);
+                                return ResponseEntity.ok(
+                                                ApiResponse.success("Reviews retrieved successfully", reviewPage.getContent(),
+                                                                PaginationMetadata.from(reviewPage)));
+                        } catch (NotFoundException e) {
+                                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                                .body(ApiResponse.notFound(e.getMessage()));
+                        }
+                });
         }
 
         @GetMapping("/post/{postId}/stats")
@@ -80,16 +92,18 @@ public class ReviewController {
                         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Post not found", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
                         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
         })
-        public ResponseEntity<ApiResponse<Map<String, Object>>> getPostRatingStats(@PathVariable Long postId) {
+        public CompletableFuture<ResponseEntity<ApiResponse<Map<String, Object>>>> getPostRatingStats(@PathVariable Long postId) {
                 log.info("GET /api/reviews/post/{}/stats", postId);
-                try {
-                        Map<String, Object> stats = reviewService.getPostRatingStats(postId);
-                        return ResponseEntity.ok(
-                                        ApiResponse.success("Rating statistics retrieved", stats));
-                } catch (NotFoundException e) {
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                        .body(ApiResponse.notFound(e.getMessage()));
-                }
+                return runAsync(() -> {
+                        try {
+                                Map<String, Object> stats = reviewService.getPostRatingStats(postId);
+                                return ResponseEntity.ok(
+                                                ApiResponse.success("Rating statistics retrieved", stats));
+                        } catch (NotFoundException e) {
+                                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                                .body(ApiResponse.notFound(e.getMessage()));
+                        }
+                });
         }
 
         @GetMapping("/{id}")
@@ -191,5 +205,17 @@ public class ReviewController {
         public record UpdateReviewRequest(
                         Integer rating,
                         String reviewText) {
+        }
+
+        private boolean isAsyncEnabled() {
+                return environment.getProperty("app.async.enabled", Boolean.class, Boolean.TRUE);
+        }
+
+        private <T> CompletableFuture<ResponseEntity<ApiResponse<T>>> runAsync(
+                        Supplier<ResponseEntity<ApiResponse<T>>> supplier) {
+                if (!isAsyncEnabled()) {
+                        return CompletableFuture.completedFuture(supplier.get());
+                }
+                return CompletableFuture.supplyAsync(supplier, epic2TaskExecutor);
         }
 }

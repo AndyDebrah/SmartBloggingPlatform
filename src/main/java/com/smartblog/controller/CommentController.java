@@ -1,8 +1,12 @@
 package com.smartblog.controller;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +46,9 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Comment Management", description = "APIs for managing comments")
 public class CommentController {
     private final CommentService commentService;
+    @Qualifier("epic2TaskExecutor")
+    private final Executor epic2TaskExecutor;
+    private final Environment environment;
 
     /**
      * Get comments for a specific post.
@@ -54,7 +61,7 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Post not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-        public ResponseEntity<ApiResponse<List<CommentDTO>>> getCommentsByPost(
+        public CompletableFuture<ResponseEntity<ApiResponse<List<CommentDTO>>>> getCommentsByPost(
             @Parameter(description = "Post ID")
             @PathVariable Long postId,
             @Parameter(description = "Page number (0-based)")
@@ -63,10 +70,18 @@ public class CommentController {
             @RequestParam(defaultValue = "20") int size
     ) {
         log.info("GET /api/comments/post/{}", postId);
-        var comments = commentService.listForPost(postId, page, size);
-        return ResponseEntity.ok(
-                ApiResponse.success("Comments retrieved successfully", comments.getContent(), PaginationMetadata.from(comments))
-        );
+        if (!isAsyncEnabled()) {
+            var comments = commentService.listForPost(postId, page, size);
+            return CompletableFuture.completedFuture(ResponseEntity.ok(
+                    ApiResponse.success("Comments retrieved successfully", comments.getContent(), PaginationMetadata.from(comments))
+            ));
+        }
+        return CompletableFuture.supplyAsync(() -> {
+            var comments = commentService.listForPost(postId, page, size);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Comments retrieved successfully", comments.getContent(), PaginationMetadata.from(comments))
+            );
+        }, epic2TaskExecutor);
     }
 
 
@@ -172,4 +187,8 @@ public class CommentController {
     public record UpdateCommentRequest(
             String content
     ) {}
+
+    private boolean isAsyncEnabled() {
+        return environment.getProperty("app.async.enabled", Boolean.class, Boolean.TRUE);
+    }
 }
