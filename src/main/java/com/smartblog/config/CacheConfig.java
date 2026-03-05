@@ -27,7 +27,16 @@ public class CacheConfig {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(caffeine);
         // Define caches used by the application
-        cacheManager.setCacheNames(java.util.List.of("postView", "postsByAuthor", "userById", "userByUsername", "tags"));
+        cacheManager.setCacheNames(java.util.List.of(
+                "postView",
+                "postsByAuthor",
+                "userById",
+                "userByUsername",
+                "tags",
+                "commentsByPost",
+                "reviewsByPost",
+                "reviewsByUser",
+                "reviewStatsByPost"));
         return cacheManager;
     }
 }

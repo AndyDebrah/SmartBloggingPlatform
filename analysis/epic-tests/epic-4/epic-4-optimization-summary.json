@@ -1,0 +1,92 @@
+{
+    "generatedAtUtc":  "2026-03-04T14:35:32.9901992Z",
+    "profile":  "local",
+    "users":  10,
+    "requestsPerUser":  20,
+    "tomcatMaxThreads":  8,
+    "endpointsByMode":  {
+                            "baseline":  {
+                                             "post_retrieval":  {
+                                                                    "requests":  200,
+                                                                    "errorCount":  0,
+                                                                    "avgMs":  113.2,
+                                                                    "p50Ms":  109.6,
+                                                                    "p95Ms":  155.54
+                                                                },
+                                             "comment_loading":  {
+                                                                     "requests":  200,
+                                                                     "errorCount":  0,
+                                                                     "avgMs":  108.62,
+                                                                     "p50Ms":  92.43,
+                                                                     "p95Ms":  223.97
+                                                                 },
+                                             "user_analytics":  {
+                                                                    "requests":  200,
+                                                                    "errorCount":  0,
+                                                                    "avgMs":  137.19,
+                                                                    "p50Ms":  134.96,
+                                                                    "p95Ms":  197.03
+                                                                }
+                                         },
+                            "optimized":  {
+                                              "post_retrieval":  {
+                                                                     "requests":  200,
+                                                                     "errorCount":  0,
+                                                                     "avgMs":  140.52,
+                                                                     "p50Ms":  122.66,
+                                                                     "p95Ms":  201.25
+                                                                 },
+                                              "comment_loading":  {
+                                                                      "requests":  200,
+                                                                      "errorCount":  0,
+                                                                      "avgMs":  71.61,
+                                                                      "p50Ms":  67.95,
+                                                                      "p95Ms":  118.21
+                                                                  },
+                                              "user_analytics":  {
+                                                                     "requests":  200,
+                                                                     "errorCount":  0,
+                                                                     "avgMs":  64.46,
+                                                                     "p50Ms":  60.84,
+                                                                     "p95Ms":  103.98
+                                                                 }
+                                          }
+                        },
+    "optimizedVsBaseline":  {
+                                "post_retrieval":  {
+                                                       "baselineAvgMs":  113.2,
+                                                       "optimizedAvgMs":  140.52,
+                                                       "deltaMs":  27.32,
+                                                       "improvementPercent":  -24.13
+                                                   },
+                                "comment_loading":  {
+                                                        "baselineAvgMs":  108.62,
+                                                        "optimizedAvgMs":  71.61,
+                                                        "deltaMs":  -37.01,
+                                                        "improvementPercent":  34.07
+                                                    },
+                                "user_analytics":  {
+                                                       "baselineAvgMs":  137.19,
+                                                       "optimizedAvgMs":  64.46,
+                                                       "deltaMs":  -72.73,
+                                                       "improvementPercent":  53.01
+                                                   }
+                            },
+    "overall":  {
+                    "baseline":  {
+                                     "avgMs":  119.67,
+                                     "p95Ms":  188.13
+                                 },
+                    "optimized":  {
+                                      "avgMs":  92.2,
+                                      "p95Ms":  160.12
+                                  },
+                    "deltaMs":  -27.47,
+                    "improvementPercent":  22.95
+                },
+    "artifacts":  {
+                      "rawCsv":  "analysis\\epic-tests\\epic-4\\epic-4-optimization-raw.csv",
+                      "baselineLog":  "analysis\\epic-tests\\epic-4\\epic-4-baseline-app-20260304143427.log",
+                      "optimizedLog":  "analysis\\epic-tests\\epic-4\\epic-4-optimized-app-20260304143500.log"
+                  }
+}

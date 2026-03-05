@@ -3,6 +3,8 @@ package com.smartblog.application.service.impl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "commentsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
     public long add(long postId, long userId, String content) {
         log.info("Adding comment to post ID: {} by user ID: {}", postId, userId);
 
@@ -56,6 +59,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "commentsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
     public boolean edit(long commentId, String content) {
         return commentRepository.findById(commentId)
                 .map(comment -> {
@@ -69,6 +73,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "commentsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
     public boolean remove(long commentId) {
         return commentRepository.findById(commentId)
                 .map(comment -> {
@@ -82,6 +87,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "commentsByPost", key = "#postId + '-' + #page + '-' + #size", condition = "@optimizationToggle.cachingEnabled")
     public Page<CommentDTO> listForPost(long postId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Comment> commentPage = commentRepository.findByPostIdAndDeletedAtIsNull(postId, pageable);

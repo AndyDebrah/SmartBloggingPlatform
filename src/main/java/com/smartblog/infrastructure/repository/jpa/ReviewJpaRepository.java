@@ -17,6 +17,12 @@ import java.util.Optional;
 @Repository
 public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 
+    interface PostRatingSummaryProjection {
+        Long getPostId();
+        Double getAverageRating();
+        Long getReviewCount();
+    }
+
     /**
      * Find review by post and user
 
@@ -53,6 +59,13 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
      * @return Count of reviews
      */
     long countByPostAndDeletedAtIsNull(Post post);
+
+    @Query(value = "SELECT p.id AS postId, COALESCE(AVG(r.rating), 0) AS averageRating, COUNT(r.id) AS reviewCount " +
+            "FROM posts p " +
+            "LEFT JOIN reviews r ON r.post_id = p.id AND r.deleted_at IS NULL " +
+            "WHERE p.id = :postId AND p.deleted_at IS NULL " +
+            "GROUP BY p.id", nativeQuery = true)
+    Optional<PostRatingSummaryProjection> findPostRatingSummary(@Param("postId") Long postId);
 
     /**
      * Check if user already reviewed post

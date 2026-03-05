@@ -11,6 +11,10 @@ import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
 import com.smartblog.core.dto.ReviewDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,9 +38,12 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewJpaRepository reviewRepository;
     private final PostJpaRepository postRepository;
     private final UserJpaRepository userRepository;
+    @Value("${app.optimization.reviewStats.singleQuery:true}")
+    private boolean singleQueryReviewStatsEnabled;
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "reviewsByPost", key = "#postId + '-' + #page + '-' + #size", condition = "@optimizationToggle.cachingEnabled")
     public Page<ReviewDTO> getReviewsByPost(Long postId, int page, int size) {
         log.debug("Fetching reviews for post ID: {}", postId);
 
@@ -51,6 +58,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "reviewsByUser", key = "#userId + '-' + #page + '-' + #size", condition = "@optimizationToggle.cachingEnabled")
     public Page<ReviewDTO> getReviewsByUser(Long userId, int page, int size) {
         log.debug("Fetching reviews by user ID: {}", userId);
 
@@ -65,14 +73,23 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "reviewStatsByPost", key = "#postId", condition = "@optimizationToggle.cachingEnabled")
     public Map<String, Object> getPostRatingStats(Long postId) {
         log.debug("Calculating rating statistics for post ID: {}", postId);
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("Post not found with id: " + postId));
-
-        Double averageRating = reviewRepository.calculateAverageRating(post);
-        long reviewCount = reviewRepository.countByPostAndDeletedAtIsNull(post);
+        Double averageRating;
+        long reviewCount;
+        if (singleQueryReviewStatsEnabled) {
+            var summary = reviewRepository.findPostRatingSummary(postId)
+                    .orElseThrow(() -> new NotFoundException("Post not found with id: " + postId));
+            averageRating = summary.getAverageRating();
+            reviewCount = summary.getReviewCount();
+        } else {
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new NotFoundException("Post not found with id: " + postId));
+            averageRating = reviewRepository.calculateAverageRating(post);
+            reviewCount = reviewRepository.countByPostAndDeletedAtIsNull(post);
+        }
 
         Map<String, Object> stats = new HashMap<>();
         stats.put("postId", postId);
@@ -92,6 +109,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "reviewStatsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+            @CacheEvict(value = "reviewsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+            @CacheEvict(value = "reviewsByUser", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
+    })
     public ReviewDTO createReview(Long postId, Long userId, Integer rating, String reviewText) {
         log.info("Creating review: postId={}, userId={}, rating={}", postId, userId, rating);
 
@@ -128,6 +150,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "reviewStatsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+            @CacheEvict(value = "reviewsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+            @CacheEvict(value = "reviewsByUser", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
+    })
     public ReviewDTO updateReview(Long reviewId, Integer rating, String reviewText) {
         log.info("Updating review ID: {}", reviewId);
 
@@ -153,6 +180,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "reviewStatsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+            @CacheEvict(value = "reviewsByPost", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+            @CacheEvict(value = "reviewsByUser", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
+    })
     public void deleteReview(Long reviewId) {
         log.info("Soft deleting review ID: {}", reviewId);
 
