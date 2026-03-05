@@ -1,0 +1,55 @@
+{
+    "generatedAtUtc":  "2026-03-04T08:37:08.7486734Z",
+    "profile":  "local",
+    "port":  8087,
+    "warmupIterations":  5,
+    "measureIterations":  25,
+    "endpoints":  {
+                      "post_retrieval":  {
+                                             "requests":  25,
+                                             "successCount":  25,
+                                             "errorCount":  0,
+                                             "avgMs":  57.19,
+                                             "minMs":  49.87,
+                                             "maxMs":  83.19,
+                                             "p50Ms":  54.5,
+                                             "p95Ms":  76.3
+                                         },
+                      "comment_loading":  {
+                                              "requests":  25,
+                                              "successCount":  25,
+                                              "errorCount":  0,
+                                              "avgMs":  46.91,
+                                              "minMs":  42.73,
+                                              "maxMs":  53.73,
+                                              "p50Ms":  46.66,
+                                              "p95Ms":  51.43
+                                          },
+                      "user_analytics":  {
+                                             "requests":  25,
+                                             "successCount":  25,
+                                             "errorCount":  0,
+                                             "avgMs":  48.85,
+                                             "minMs":  44.08,
+                                             "maxMs":  55.51,
+                                             "p50Ms":  48.38,
+                                             "p95Ms":  52.31
+                                         }
+                  },
+    "jfr":  {
+                "file":  "analysis\\epic-tests\\epic-1\\epic-1-baseline.jfr",
+                "avgJvmUserCpuPercent":  754.4,
+                "avgJvmSystemCpuPercent":  99,
+                "peakHeapUsedMb":  "",
+                "heapUsedMbFromJcmd":  105.77
+            },
+    "artifacts":  {
+                      "appLog":  "analysis\\epic-tests\\epic-1\\epic-1-app.log",
+                      "appErrLog":  "analysis\\epic-tests\\epic-1\\epic-1-app.err.log",
+                      "threadDump":  "analysis\\epic-tests\\epic-1\\epic-1-threaddump.txt",
+                      "heapInfo":  "analysis\\epic-tests\\epic-1\\epic-1-heap-info.txt",
+                      "rawLatencyCsv":  "analysis\\epic-tests\\epic-1\\baseline-latency-raw.csv",
+                      "executionSamples":  "analysis\\epic-tests\\epic-1\\jfr-cpu.txt",
+                      "allocationSamples":  "analysis\\epic-tests\\epic-1\\jfr-alloc.txt"
+                  }
+}
