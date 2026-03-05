@@ -23,6 +23,7 @@ import com.smartblog.core.model.User;
 import com.smartblog.infrastructure.repository.jpa.PostJpaRepository;
 import com.smartblog.infrastructure.repository.jpa.UserJpaRepository;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -133,6 +134,9 @@ public class PostServiceImpl implements PostService {
                 .map(PostMapper::toDTO);
     }
 
+
+
+    @Timed("posts.service.list")
     @Override
     @Transactional(readOnly = true)
     public Page<PostDTO> list(int page, int size) {
@@ -141,6 +145,9 @@ public class PostServiceImpl implements PostService {
         return mapToDtoPage(postPage);
     }
 
+
+
+    @Timed("posts.service.search")
     @Override
     @Transactional(readOnly = true)
     public Page<PostDTO> search(String keyword, int page, int size) {
@@ -157,6 +164,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "postsByAuthor", key = "#authorId + '-' + #page + '-' + #size")
+    @Timed("posts.service.listByAuthor")
     public Page<PostDTO> listByAuthor(long authorId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> postPage = postRepository.findByAuthorId(authorId, pageable);

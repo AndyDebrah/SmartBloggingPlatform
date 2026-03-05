@@ -1,0 +1,7 @@
+"stage","timestampUtc","httpServerRequestsCount","jvmMemoryUsedBytes","jvmThreadsLive"
+"before_post_retrieval","2026-03-05T11:57:29.3757768Z","16","313150224","40"
+"after_post_retrieval","2026-03-05T11:57:30.6111401Z","99","267402520","40"
+"before_comment_loading","2026-03-05T11:57:31.0158578Z","112","280552952","40"
+"after_comment_loading","2026-03-05T11:57:31.5830853Z","195","357323920","40"
+"before_user_analytics","2026-03-05T11:57:32.0682903Z","208","375142784","40"
+"after_user_analytics","2026-03-05T11:57:32.7695227Z","291","312989408","40"

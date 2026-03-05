@@ -1,0 +1,79 @@
+{
+    "generatedAtUtc":  "2026-03-05T11:57:33.6055361Z",
+    "profile":  "local",
+    "users":  8,
+    "requestsPerUser":  10,
+    "tomcatMaxThreads":  8,
+    "endpointMetrics":  {
+                            "post_retrieval":  {
+                                                   "requests":  80,
+                                                   "errorCount":  0,
+                                                   "avgMs":  87.45,
+                                                   "p50Ms":  85.21,
+                                                   "p95Ms":  124.64,
+                                                   "maxMs":  166.39
+                                               },
+                            "comment_loading":  {
+                                                    "requests":  80,
+                                                    "errorCount":  0,
+                                                    "avgMs":  37.44,
+                                                    "p50Ms":  37.54,
+                                                    "p95Ms":  50.59,
+                                                    "maxMs":  54.21
+                                                },
+                            "user_analytics":  {
+                                                   "requests":  80,
+                                                   "errorCount":  0,
+                                                   "avgMs":  46.47,
+                                                   "p50Ms":  46.98,
+                                                   "p95Ms":  61.13,
+                                                   "maxMs":  67.85
+                                               }
+                        },
+    "overall":  {
+                    "requests":  240,
+                    "errorCount":  0,
+                    "avgMs":  57.12,
+                    "p95Ms":  102.7,
+                    "throughputReqPerSec":  24.33
+                },
+    "runtimeMetrics":  {
+                           "httpServerRequestsCount":  {
+                                                           "before":  3,
+                                                           "after":  295,
+                                                           "delta":  292
+                                                       },
+                           "heapUsedBytes":  {
+                                                 "before":  283669120,
+                                                 "after":  317248608,
+                                                 "delta":  33579488
+                                             },
+                           "threadsLive":  {
+                                               "before":  31,
+                                               "after":  40,
+                                               "delta":  9
+                                           }
+                       },
+    "visualization":  {
+                          "prometheusBeforeCaptured":  true,
+                          "prometheusAfterCaptured":  true,
+                          "timelineCsv":  "analysis\\epic-tests\\epic-5\\epic-5-metrics-timeline.csv"
+                      },
+    "priorEpicSummary":  {
+                             "epic1BaselineOverallAvgMs":  50.98,
+                             "epic2AsyncOverallAvgMs":  149.97,
+                             "epic3BestOverallAvgMs":  134.39,
+                             "epic4OptimizedOverallAvgMs":  92.2,
+                             "epic5OverallAvgMs":  57.12
+                         },
+    "artifacts":  {
+                      "rawCsv":  "analysis\\epic-tests\\epic-5\\epic-5-metrics-raw.csv",
+                      "summaryJson":  "analysis\\epic-tests\\epic-5\\epic-5-metrics-summary.json",
+                      "report":  "analysis\\epic-tests\\epic-5\\epic-5-metrics-report.md",
+                      "timelineCsv":  "analysis\\epic-tests\\epic-5\\epic-5-metrics-timeline.csv",
+                      "promBefore":  "analysis\\epic-tests\\epic-5\\prom-before.txt",
+                      "promAfter":  "analysis\\epic-tests\\epic-5\\prom-after.txt",
+                      "appLog":  "analysis\\epic-tests\\epic-5\\epic-5-app-20260305115703.log",
+                      "appErrLog":  "analysis\\epic-tests\\epic-5\\epic-5-app-20260305115703.err.log"
+                  }
+}
