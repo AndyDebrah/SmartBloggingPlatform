@@ -1,0 +1,143 @@
+{
+    "generatedAtUtc":  "2026-03-04T13:47:03.6673697Z",
+    "profile":  "local",
+    "users":  12,
+    "requestsPerUser":  10,
+    "tomcatMaxThreads":  8,
+    "evaluatedConfigs":  [
+                             {
+                                 "config":  "c4-m16-q150",
+                                 "corePoolSize":  4,
+                                 "maxPoolSize":  16,
+                                 "queueCapacity":  150,
+                                 "requests":  360,
+                                 "errorCount":  0,
+                                 "overallAvgMs":  138.77,
+                                 "overallP50Ms":  121.15,
+                                 "overallP95Ms":  288.13,
+                                 "cpuUtilizationPercent":  27.51,
+                                 "workingSetMb":  446.71,
+                                 "heapUsedMb":  157.46,
+                                 "threadCount":  65,
+                                 "durationSec":  7.39,
+                                 "appLog":  "analysis\\epic-tests\\epic-3\\epic-3-c4-m16-q150-app-20260304134453.log",
+                                 "appErrLog":  "analysis\\epic-tests\\epic-3\\epic-3-c4-m16-q150-app-20260304134453.err.log",
+                                 "endpointSummary":  {
+                                                         "post_retrieval":  {
+                                                                                "requests":  120,
+                                                                                "errorCount":  0,
+                                                                                "avgMs":  199.98,
+                                                                                "p50Ms":  167.4,
+                                                                                "p95Ms":  455.7
+                                                                            },
+                                                         "comment_loading":  {
+                                                                                 "requests":  120,
+                                                                                 "errorCount":  0,
+                                                                                 "avgMs":  87.38,
+                                                                                 "p50Ms":  86.52,
+                                                                                 "p95Ms":  107.27
+                                                                             },
+                                                         "user_analytics":  {
+                                                                                "requests":  120,
+                                                                                "errorCount":  0,
+                                                                                "avgMs":  128.97,
+                                                                                "p50Ms":  127.41,
+                                                                                "p95Ms":  164.54
+                                                                            }
+                                                     }
+                             },
+                             {
+                                 "config":  "c8-m32-q300",
+                                 "corePoolSize":  8,
+                                 "maxPoolSize":  32,
+                                 "queueCapacity":  300,
+                                 "requests":  360,
+                                 "errorCount":  0,
+                                 "overallAvgMs":  134.39,
+                                 "overallP50Ms":  118.94,
+                                 "overallP95Ms":  254.53,
+                                 "cpuUtilizationPercent":  32.14,
+                                 "workingSetMb":  472.28,
+                                 "heapUsedMb":  140.79,
+                                 "threadCount":  68,
+                                 "durationSec":  6.47,
+                                 "appLog":  "analysis\\epic-tests\\epic-3\\epic-3-c8-m32-q300-app-20260304134539.log",
+                                 "appErrLog":  "analysis\\epic-tests\\epic-3\\epic-3-c8-m32-q300-app-20260304134539.err.log",
+                                 "endpointSummary":  {
+                                                         "post_retrieval":  {
+                                                                                "requests":  120,
+                                                                                "errorCount":  0,
+                                                                                "avgMs":  167.5,
+                                                                                "p50Ms":  130.72,
+                                                                                "p95Ms":  428.67
+                                                                            },
+                                                         "comment_loading":  {
+                                                                                 "requests":  120,
+                                                                                 "errorCount":  0,
+                                                                                 "avgMs":  90.64,
+                                                                                 "p50Ms":  88.06,
+                                                                                 "p95Ms":  110.95
+                                                                             },
+                                                         "user_analytics":  {
+                                                                                "requests":  120,
+                                                                                "errorCount":  0,
+                                                                                "avgMs":  145.03,
+                                                                                "p50Ms":  131.54,
+                                                                                "p95Ms":  249.12
+                                                                            }
+                                                     }
+                             },
+                             {
+                                 "config":  "c12-m48-q500",
+                                 "corePoolSize":  12,
+                                 "maxPoolSize":  48,
+                                 "queueCapacity":  500,
+                                 "requests":  360,
+                                 "errorCount":  0,
+                                 "overallAvgMs":  143.21,
+                                 "overallP50Ms":  121.34,
+                                 "overallP95Ms":  283.71,
+                                 "cpuUtilizationPercent":  32.53,
+                                 "workingSetMb":  484.8,
+                                 "heapUsedMb":  156.95,
+                                 "threadCount":  75,
+                                 "durationSec":  6.73,
+                                 "appLog":  "analysis\\epic-tests\\epic-3\\epic-3-c12-m48-q500-app-20260304134621.log",
+                                 "appErrLog":  "analysis\\epic-tests\\epic-3\\epic-3-c12-m48-q500-app-20260304134621.err.log",
+                                 "endpointSummary":  {
+                                                         "post_retrieval":  {
+                                                                                "requests":  120,
+                                                                                "errorCount":  0,
+                                                                                "avgMs":  203.44,
+                                                                                "p50Ms":  165.35,
+                                                                                "p95Ms":  466.22
+                                                                            },
+                                                         "comment_loading":  {
+                                                                                 "requests":  120,
+                                                                                 "errorCount":  0,
+                                                                                 "avgMs":  97.34,
+                                                                                 "p50Ms":  97.94,
+                                                                                 "p95Ms":  122.69
+                                                                             },
+                                                         "user_analytics":  {
+                                                                                "requests":  120,
+                                                                                "errorCount":  0,
+                                                                                "avgMs":  128.84,
+                                                                                "p50Ms":  122.39,
+                                                                                "p95Ms":  189.72
+                                                                            }
+                                                     }
+                             }
+                         ],
+    "selectedOptimalConfig":  {
+                                  "config":  "c8-m32-q300",
+                                  "corePoolSize":  8,
+                                  "maxPoolSize":  32,
+                                  "queueCapacity":  300,
+                                  "selectionReason":  "Lowest error count, then lowest overall p95, then lowest overall average latency."
+                              },
+    "artifacts":  {
+                      "rawCsv":  "analysis\\epic-tests\\epic-3\\epic-3-threadpool-tuning-raw.csv",
+                      "report":  "analysis\\epic-tests\\epic-3\\epic-3-threadpool-tuning-report.md"
+                  }
+}

@@ -31,11 +31,8 @@ public class RedisRefreshTokenService implements RefreshTokenService {
     @Override
     public String validateAndConsume(String token) {
         String key = "refresh:" + token;
-        String user = redis.opsForValue().get(key);
-        if (user == null) return null;
-        // consume
-        redis.delete(key);
-        return user;
+        // Atomic consume avoids race where two threads both read the same refresh token.
+        return redis.opsForValue().getAndDelete(key);
     }
 
     @Override
