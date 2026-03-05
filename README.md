@@ -14,6 +14,7 @@ SmartBloggingPlatform is a Spring Boot backend for blogging features (users, pos
 - [8. Testing Guide](#8-testing-guide)
 - [9. Performance Notes](#9-performance-notes)
 - [10. Module 7 Security Enhancement Report (Epic 1-5)](#10-module-7-security-enhancement-report-epic-1-5)
+- [11. Module 8 Advanced Optimization Report (Epic 1-5)](#11-module-8-advanced-optimization-report-epic-1-5)
 
 ## 1. Project Overview
 
@@ -367,6 +368,177 @@ Module 7 evaluation categories are covered through implementation and repeatable
 - DSA application in security logic
 - Testing and logging evidence
 - Documentation quality
+
+## 11. Module 8 Advanced Optimization Report (Epic 1-5)
+
+This section documents the full Module 8 performance journey from baseline profiling to final observability and production-readiness verification.
+
+### 11.1 Module 8 Scope and Objective
+
+Module 8 goals implemented in this project:
+- Profile and identify bottlenecks with evidence.
+- Introduce asynchronous execution for read-heavy API paths.
+- Ensure thread safety under concurrent token and request operations.
+- Optimize data-path performance with caching and query improvements.
+- Build runtime metrics collection and reporting workflow.
+
+Primary optimized endpoint scenarios:
+- `GET /api/posts?page=0&size=20` (post retrieval)
+- `GET /api/comments/post/1?page=0&size=20` (comment loading)
+- `GET /api/reviews/post/1/stats` (user analytics/review stats)
+
+### 11.2 Epic-by-Epic Implementation Summary
+
+| Epic | Focus | Key Implementation | Status |
+|---|---|---|---|
+| Epic 1 | Bottleneck analysis | Baseline profiling script + JFR/latency/thread/heap artifacts | Complete |
+| Epic 2 | Async programming | `CompletableFuture` controller paths + custom executor + async A/B benchmark | Complete |
+| Epic 3 | Concurrency + thread safety | Token-store race hardening + concurrency tests + pool tuning matrix | Complete |
+| Epic 4 | Data optimization | Review stats single-query path + cache strategy + optimization benchmark | Complete |
+| Epic 5 | Metrics and reporting | Actuator/Prometheus metrics pipeline + final report artifacts | Complete |
+
+### 11.3 Epic 1 - Performance Bottleneck Analysis
+
+Implemented:
+- Baseline harness: `scripts/epic1_baseline_capture.ps1`
+- Evidence set:
+  - `analysis/epic-tests/epic-1/baseline-summary.json`
+  - `analysis/epic-tests/epic-1/baseline-latency-raw.csv`
+  - `analysis/epic-tests/epic-1/epic-1-baseline.jfr`
+  - `analysis/epic-tests/epic-1/epic-1-threaddump.txt`
+  - `analysis/epic-tests/epic-1/epic-1-heap-info.txt`
+  - JMC screenshots in `analysis/epic-tests/epic-1/Screenshots/`
+
+Outcome:
+- Established a reproducible baseline.
+- Identified highest tail latency focus areas for subsequent epics.
+
+### 11.4 Epic 2 - Asynchronous Programming
+
+Implemented:
+- Async executor configuration:
+  - `src/main/java/com/smartblog/config/AsyncConfig.java`
+- Async endpoint execution in controllers:
+  - `src/main/java/com/smartblog/controller/PostController.java`
+  - `src/main/java/com/smartblog/controller/CommentController.java`
+  - `src/main/java/com/smartblog/controller/ReviewController.java`
+- JWT async dispatch compatibility:
+  - `src/main/java/com/smartblog/auth/JwtAuthenticationFilter.java`
+- Benchmark tooling:
+  - `scripts/epic2_async_ab_test.ps1`
+  - `analysis/epic-tests/epic-2/epic-2-async-ab-summary.json`
+
+Result:
+- Async mode improved concurrent average latency and p95 against sync mode in controlled A/B tests.
+- No data loss/corruption symptoms observed in benchmark runs.
+
+### 11.5 Epic 3 - Concurrency and Thread Safety
+
+Implemented:
+- Thread-safe refresh token handling:
+  - `src/main/java/com/smartblog/auth/InMemoryRefreshTokenService.java`
+  - `src/main/java/com/smartblog/auth/RedisRefreshTokenService.java`
+- Concurrency validation:
+  - `src/test/java/com/smartblog/auth/InMemoryRefreshTokenServiceConcurrencyTest.java`
+- Thread-pool tuning matrix:
+  - `scripts/epic3_threadpool_tuning.ps1`
+  - `analysis/epic-tests/epic-3/epic-3-threadpool-tuning-summary.json`
+
+Result:
+- One-time token consumption behavior validated under contention.
+- Optimal async pool profile selected from measured CPU/memory/latency trade-offs.
+
+### 11.6 Epic 4 - Data and Algorithmic Optimization
+
+Implemented:
+- Single-query review stats aggregation:
+  - `src/main/java/com/smartblog/infrastructure/repository/jpa/ReviewJpaRepository.java`
+  - `src/main/java/com/smartblog/application/service/impl/ReviewServiceImpl.java`
+- Caching for hot read paths:
+  - `src/main/java/com/smartblog/application/service/impl/CommentServiceImpl.java`
+  - `src/main/java/com/smartblog/application/service/impl/ReviewServiceImpl.java`
+  - `src/main/java/com/smartblog/config/CacheConfig.java`
+  - `src/main/java/com/smartblog/config/OptimizationToggle.java`
+- Verification tests:
+  - `src/test/java/com/smartblog/application/service/ReviewServiceImplOptimizationTest.java`
+  - `src/test/java/com/smartblog/config/Epic4CachingContractTest.java`
+
+Result:
+- Significant gains on comment loading and analytics paths.
+- One known regression (`post_retrieval`) tracked as accepted Epic 4 risk with documented rationale.
+
+### 11.7 Epic 5 - Final Metrics, Stability, and Readiness
+
+Implemented:
+- Metrics dependencies and `@Timed` support:
+  - `pom.xml`
+  - `src/main/java/com/smartblog/config/MetricsConfig.java`
+  - timed endpoints/services in post paths
+- Runtime exposure:
+  - `src/main/resources/application.properties`
+  - `src/main/resources/application-prod.properties`
+  - `src/main/resources/application-test.properties`
+- Metrics/reporting harness:
+  - `scripts/epic5_metrics_reporting.ps1`
+  - `analysis/epic-tests/epic-5/epic-5-metrics-summary.json`
+  - `analysis/epic-tests/epic-5/epic-5-metrics-report.md`
+  - `analysis/epic-tests/epic-5/prom-before.txt`
+  - `analysis/epic-tests/epic-5/prom-after.txt`
+
+Key verified run snapshot:
+- Requests: `240`
+- Errors: `0`
+- Overall avg latency: `57.12 ms`
+- Overall p95 latency: `102.70 ms`
+- Throughput estimate: `24.33 req/s`
+
+### 11.8 Final Performance and Stability Interpretation
+
+What improved:
+- Higher concurrency resilience through async decoupling and tuned pools.
+- Better hot-path response times via cache + query consolidation.
+- Stronger operational confidence through structured metrics collection.
+
+What was validated:
+- Functional and security behavior remained intact.
+- No critical runtime instability observed across epic benchmark runs.
+- Performance evidence is reproducible via script-driven artifacts.
+
+### 11.9 Module 8 Deliverables Mapping
+
+| Module 8 Deliverable | Project Implementation |
+|---|---|
+| Bottleneck profiling | Epic 1 baseline harness + JFR/thread/heap artifacts |
+| Async optimization | Async controllers + executor + A/B benchmark artifacts |
+| Thread safety and tuning | Token concurrency hardening + tuning matrix + tests |
+| Data-path optimization | Cache strategy + single-query aggregation + optimization report |
+| Metrics and reporting | Actuator/Prometheus pipeline + final metrics report package |
+
+### 11.10 Reproducibility Commands
+
+Windows PowerShell:
+
+```powershell
+.\scripts\epic1_baseline_capture.ps1 -Profile local -Port 8085 -WarmupIterations 5 -MeasureIterations 25
+.\scripts\epic2_async_ab_test.ps1 -Profile local -Port 8110 -Users 12 -RequestsPerUser 10 -TomcatMaxThreads 8
+.\scripts\epic3_threadpool_tuning.ps1 -Profile local -StartPort 8120 -Users 12 -RequestsPerUser 10 -TomcatMaxThreads 8
+.\scripts\epic4_data_optimization_compare.ps1 -Profile local -Port 8130 -Users 10 -RequestsPerUser 20 -TomcatMaxThreads 8
+.\scripts\epic5_metrics_reporting.ps1 -Profile local -Port 8140 -Users 8 -RequestsPerUser 10 -TomcatMaxThreads 8
+```
+
+Expected outputs:
+- `analysis/epic-tests/epic-1` through `analysis/epic-tests/epic-5` artifact directories.
+
+### 11.11 Final Module 8 Status
+
+- Epic 1: completed and verified
+- Epic 2: completed and verified
+- Epic 3: completed and verified
+- Epic 4: completed and verified
+- Epic 5: completed and verified
+
+Project conclusion:
+- Module 8 implementation is complete, evidence-backed, and defense-ready for performance optimization evaluation.
 
 
 

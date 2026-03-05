@@ -133,9 +133,10 @@ public class PostServiceImpl implements PostService {
                 .filter(post -> !post.isDeleted())
                 .map(PostMapper::toDTO);
     }
-
-
-
+    /**
+     * Primary paginated post listing path.
+     * Timed to monitor read latency trends across optimization epics.
+     */
     @Timed("posts.service.list")
     @Override
     @Transactional(readOnly = true)
@@ -144,9 +145,9 @@ public class PostServiceImpl implements PostService {
         Page<Post> postPage = postRepository.findByDeletedAtIsNull(pageable);
         return mapToDtoPage(postPage);
     }
-
-
-
+    /**
+     * Search endpoint with full-text primary strategy and LIKE fallback for compatibility.
+     */
     @Timed("posts.service.search")
     @Override
     @Transactional(readOnly = true)
@@ -161,6 +162,9 @@ public class PostServiceImpl implements PostService {
         return mapToDtoPage(postPage);
     }
 
+    /**
+     * Author-specific listing, cached and timed because it is a repeated dashboard query.
+     */
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "postsByAuthor", key = "#authorId + '-' + #page + '-' + #size")

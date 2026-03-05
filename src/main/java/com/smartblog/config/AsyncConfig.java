@@ -8,6 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
+/**
+ * Async executor configuration for Epic 2/3 workloads.
+ * Values are sanitized to keep startup safe even when properties are misconfigured.
+ */
 @Configuration
 public class AsyncConfig {
 
@@ -26,6 +30,10 @@ public class AsyncConfig {
     @Value("${app.async.awaitTerminationSeconds:30}")
     private int awaitTerminationSeconds;
 
+    /**
+     * Dedicated executor used by async controller endpoints.
+     * CallerRunsPolicy provides backpressure when pool and queue are saturated.
+     */
     @Bean("epic2TaskExecutor")
     public Executor taskExecutor() {
         int safeCore = Math.max(1, corePoolSize);

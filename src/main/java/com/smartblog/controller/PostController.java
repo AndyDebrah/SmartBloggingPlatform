@@ -1,12 +1,14 @@
 package com.smartblog.controller;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +33,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import io.micrometer.core.annotation.Timed;
 
 /**
  * REST API endpoints for Post management.
@@ -48,15 +50,17 @@ import io.micrometer.core.annotation.Timed;
 @Tag(name = "Post Management", description = "APIs for managing blog posts")
 public class PostController {
     private final PostService postService;
+
     @Qualifier("epic2TaskExecutor")
     private final Executor epic2TaskExecutor;
+
     private final Environment environment;
 
     /**
      * Get all posts with pagination.
      */
-        @GetMapping
-        @Timed("posts.getAll")
+    @GetMapping
+    @Timed("posts.getAll")
     @Operation(summary = "Get all posts", description = "Retrieve paginated list of posts")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Posts retrieved successfully",
@@ -82,6 +86,7 @@ public class PostController {
      * Search posts by keyword.
      */
     @GetMapping("/search")
+    @Timed("posts.search")
     @Operation(summary = "Search posts", description = "Full-text search on post titles and content")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Search results retrieved",
@@ -89,8 +94,7 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid search query"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-        @Timed("posts.search")
-        public CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> searchPosts(
+    public CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> searchPosts(
             @Parameter(description = "Search keyword(s)", required = true)
             @RequestParam String q,
             @Parameter(description = "Page number (0-based)")
@@ -135,6 +139,7 @@ public class PostController {
      * Get posts by author.
      */
     @GetMapping("/author/{authorId}")
+    @Timed("posts.byAuthor")
     @Operation(summary = "Get posts by author", description = "Retrieve all posts by a specific author")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Posts retrieved successfully",
@@ -142,8 +147,7 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Author not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-        @Timed("posts.byAuthor")
-        public CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> getPostsByAuthor(
+    public CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> getPostsByAuthor(
             @Parameter(description = "Author ID")
             @PathVariable Long authorId,
             @Parameter(description = "Page number (0-based)")
@@ -159,8 +163,6 @@ public class PostController {
             );
         });
     }
-
-
 
     /**
      * Create a new post.
@@ -196,7 +198,7 @@ public class PostController {
      * Update an existing post.
      */
     @PutMapping("/{id}")
-        @PreAuthorize("hasRole('ADMIN') or @postSecurity.isOwner(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @postSecurity.isOwner(#id)")
     @Operation(summary = "Update post", description = "Update an existing post")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Post updated successfully",
@@ -211,22 +213,22 @@ public class PostController {
             @Valid @RequestBody PostCreateRequest request
     ) {
         log.info("PUT /api/posts/{}", id);
-        
+
         boolean updated = postService.update(
                 id,
                 request.title(),
                 request.content(),
                 request.published()
         );
-        
+
         if (!updated) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.notFound("Post not found with id: " + id));
         }
-        
+
         PostDTO updatedPost = postService.getView(id)
                 .orElseThrow(() -> new RuntimeException("Post update failed"));
-        
+
         return ResponseEntity.ok(
                 ApiResponse.success("Post updated successfully", updatedPost)
         );
@@ -236,7 +238,7 @@ public class PostController {
      * Soft delete a post.
      */
     @DeleteMapping("/{id}")
-        @PreAuthorize("hasRole('ADMIN') or @postSecurity.isOwner(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @postSecurity.isOwner(#id)")
     @Operation(summary = "Delete post", description = "Soft delete a post")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Post deleted successfully"),
@@ -248,24 +250,30 @@ public class PostController {
             @PathVariable Long id
     ) {
         log.info("DELETE /api/posts/{}", id);
-        
+
         boolean deleted = postService.softDelete(id);
         if (!deleted) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.notFound("Post not found with id: " + id));
         }
-        
+
         return ResponseEntity.ok(
                 ApiResponse.<Void>success("Post deleted successfully")
         );
     }
 
+    /**
+     * Runtime feature toggle to compare synchronous and asynchronous endpoint execution.
+     */
     private boolean isAsyncEnabled() {
         return environment.getProperty("app.async.enabled", Boolean.class, Boolean.TRUE);
     }
 
+    /**
+     * Executes endpoint supplier on async executor when enabled, otherwise in request thread.
+     */
     private CompletableFuture<ResponseEntity<ApiResponse<List<PostDTO>>>> runAsync(
-            java.util.function.Supplier<ResponseEntity<ApiResponse<List<PostDTO>>>> supplier) {
+            Supplier<ResponseEntity<ApiResponse<List<PostDTO>>>> supplier) {
         if (!isAsyncEnabled()) {
             return CompletableFuture.completedFuture(supplier.get());
         }

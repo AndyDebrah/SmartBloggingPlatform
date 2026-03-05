@@ -1,12 +1,14 @@
 package com.smartblog.controller;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +30,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * REST API endpoints for Comment management.
  * Base URL: /api/comments
- * 
- * REFACTORED: Now uses Service Layer pattern (CommentService) instead of direct repository access.
+ *
+ * REFACTORED: Uses service-layer abstraction and async execution for read-heavy paths.
  */
 @RestController
 @RequestMapping("/api/comments")
@@ -46,12 +47,15 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Comment Management", description = "APIs for managing comments")
 public class CommentController {
     private final CommentService commentService;
+
     @Qualifier("epic2TaskExecutor")
     private final Executor epic2TaskExecutor;
+
     private final Environment environment;
 
     /**
      * Get comments for a specific post.
+     * Uses async execution when enabled to reduce servlet-thread hold time under concurrent load.
      */
     @GetMapping("/post/{postId}")
     @Operation(summary = "Get comments by post", description = "Retrieve all comments for a specific post")
@@ -61,7 +65,7 @@ public class CommentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Post not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
-        public CompletableFuture<ResponseEntity<ApiResponse<List<CommentDTO>>>> getCommentsByPost(
+    public CompletableFuture<ResponseEntity<ApiResponse<List<CommentDTO>>>> getCommentsByPost(
             @Parameter(description = "Post ID")
             @PathVariable Long postId,
             @Parameter(description = "Page number (0-based)")
@@ -73,22 +77,18 @@ public class CommentController {
         if (!isAsyncEnabled()) {
             var comments = commentService.listForPost(postId, page, size);
             return CompletableFuture.completedFuture(ResponseEntity.ok(
-                    ApiResponse.success("Comments retrieved successfully", comments.getContent(), PaginationMetadata.from(comments))
+                    ApiResponse.success("Comments retrieved successfully", comments.getContent(),
+                            PaginationMetadata.from(comments))
             ));
         }
         return CompletableFuture.supplyAsync(() -> {
             var comments = commentService.listForPost(postId, page, size);
             return ResponseEntity.ok(
-                    ApiResponse.success("Comments retrieved successfully", comments.getContent(), PaginationMetadata.from(comments))
+                    ApiResponse.success("Comments retrieved successfully", comments.getContent(),
+                            PaginationMetadata.from(comments))
             );
         }, epic2TaskExecutor);
     }
-
-
-
-
-
-
 
     /**
      * Create a new comment.
@@ -106,14 +106,14 @@ public class CommentController {
             @Valid @RequestBody CreateCommentRequest request
     ) {
         log.info("POST /api/comments - postId={}, userId={}", request.postId(), request.userId());
-        
-        long commentId = commentService.add(
+
+        commentService.add(
                 request.postId(),
                 request.userId(),
                 request.content()
         );
-        
-        // For simplicity, return success without fetching the created comment
+
+        // Create endpoint currently returns status-only payload by design.
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created("Comment created successfully", null));
     }
@@ -122,7 +122,7 @@ public class CommentController {
      * Update an existing comment.
      */
     @PutMapping("/{id}")
-        @PreAuthorize("hasRole('ADMIN') or @commentSecurity.isOwner(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @commentSecurity.isOwner(#id)")
     @Operation(summary = "Update comment", description = "Update an existing comment")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Comment updated successfully",
@@ -137,13 +137,13 @@ public class CommentController {
             @RequestBody UpdateCommentRequest request
     ) {
         log.info("PUT /api/comments/{}", id);
-        
+
         boolean updated = commentService.edit(id, request.content());
         if (!updated) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.notFound("Comment not found with id: " + id));
         }
-        
+
         return ResponseEntity.ok(
                 ApiResponse.success("Comment updated successfully", null)
         );
@@ -153,7 +153,7 @@ public class CommentController {
      * Soft delete a comment.
      */
     @DeleteMapping("/{id}")
-        @PreAuthorize("hasRole('ADMIN') or @commentSecurity.isOwner(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @commentSecurity.isOwner(#id)")
     @Operation(summary = "Delete comment", description = "Soft delete a comment")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Comment deleted successfully"),
@@ -165,19 +165,18 @@ public class CommentController {
             @PathVariable Long id
     ) {
         log.info("DELETE /api/comments/{}", id);
-        
+
         boolean deleted = commentService.remove(id);
         if (!deleted) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.notFound("Comment not found with id: " + id));
         }
-        
+
         return ResponseEntity.ok(
                 ApiResponse.<Void>success("Comment deleted successfully")
         );
     }
 
-    // Request DTOs
     public record CreateCommentRequest(
             Long postId,
             Long userId,
@@ -188,6 +187,9 @@ public class CommentController {
             String content
     ) {}
 
+    /**
+     * Runtime feature toggle for async path A/B comparison.
+     */
     private boolean isAsyncEnabled() {
         return environment.getProperty("app.async.enabled", Boolean.class, Boolean.TRUE);
     }
