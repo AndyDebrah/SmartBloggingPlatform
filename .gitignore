@@ -59,3 +59,9 @@ application-dev.properties
 performance_report_*.txt
 .consolidation-notes.md
 /config/
+/OPTIMIZATION_TEST_PROTOCOL_AND_LOG.md
+/PERFORMANCE_TODO.md
+/TECHNICAL_OPTIMIZATION_DOCUMENTATION.md
+/Module 8.txt
+/MARK_DONE_TRACKER.md
+/EPIC_TEST_PLAN.md

@@ -28,6 +28,7 @@ public class CacheConfig {
         cacheManager.setCaffeine(caffeine);
         // Define caches used by the application
         cacheManager.setCacheNames(java.util.List.of(
+                "postsPage",
                 "postView",
                 "postsByAuthor",
                 "userById",

@@ -100,11 +100,14 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, JpaSpecifi
                         Pageable pageable);
 
         /**
-         * Find all active (not soft-deleted) posts
-         * 
+         * Find all active (not soft-deleted) posts.
+         *
+         * Note: We intentionally avoid eager graph loading here because the service
+         * layer performs a dedicated hydration query (author + tags) to prevent
+         * N+1 without redundant fetching.
+         *
          * @return Page of active posts
          */
-        @EntityGraph(attributePaths = { "author" })
         Page<Post> findByDeletedAtIsNull(Pageable pageable);
 
         /**

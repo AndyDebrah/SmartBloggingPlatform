@@ -41,7 +41,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "postsByAuthor", allEntries = true)
+    @Caching(evict = {
+        @CacheEvict(value = "postsByAuthor", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+        @CacheEvict(value = "postsPage", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
+    })
     public long createDraft(long authorId, String title, String content) {
         log.info("Creating draft post for author ID: {}", authorId);
 
@@ -64,8 +67,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "postView", key = "#postId"),
-        @CacheEvict(value = "postsByAuthor", allEntries = true)
+        @CacheEvict(value = "postView", key = "#postId", condition = "@optimizationToggle.cachingEnabled"),
+        @CacheEvict(value = "postsByAuthor", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+        @CacheEvict(value = "postsPage", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
     })
     public boolean publish(long postId) {
         return postRepository.findById(postId)
@@ -81,8 +85,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "postView", key = "#postId"),
-        @CacheEvict(value = "postsByAuthor", allEntries = true)
+        @CacheEvict(value = "postView", key = "#postId", condition = "@optimizationToggle.cachingEnabled"),
+        @CacheEvict(value = "postsByAuthor", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+        @CacheEvict(value = "postsPage", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
     })
     public boolean update(long postId, String title, String content, boolean published) {
         return postRepository.findById(postId)
@@ -104,8 +109,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "postView", key = "#postId"),
-        @CacheEvict(value = "postsByAuthor", allEntries = true)
+        @CacheEvict(value = "postView", key = "#postId", condition = "@optimizationToggle.cachingEnabled"),
+        @CacheEvict(value = "postsByAuthor", allEntries = true, condition = "@optimizationToggle.cachingEnabled"),
+        @CacheEvict(value = "postsPage", allEntries = true, condition = "@optimizationToggle.cachingEnabled")
     })
     public boolean softDelete(long postId) {
         return postRepository.findById(postId)
@@ -127,7 +133,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "postView", key = "#id")
+    @Cacheable(value = "postView", key = "#id", condition = "@optimizationToggle.cachingEnabled")
     public Optional<PostDTO> getView(long id) {
         return postRepository.findById(id)
                 .filter(post -> !post.isDeleted())
@@ -140,6 +146,7 @@ public class PostServiceImpl implements PostService {
     @Timed("posts.service.list")
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "postsPage", key = "#page + '-' + #size", condition = "@optimizationToggle.cachingEnabled")
     public Page<PostDTO> list(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Post> postPage = postRepository.findByDeletedAtIsNull(pageable);
